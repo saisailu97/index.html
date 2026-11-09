@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Field Notes — An Interactive Travel Journal</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   THEME
+   ============================================================ */
+:root{
+  --ink:        #1d1a17;
+  --ink-soft:   #5c554d;
+  --ink-faint:  #938a7f;
+  --paper:      #fbf7f0;
+  --paper-2:    #f3ece1;
+  --line:       #e2d8c8;
+  --accent:     #c2562e;
+  --accent-2:   #0f6b63;
+  --shadow:     0 10px 40px rgba(29,26,23,.14);
+  --radius:     14px;
+  --panel-w:    460px;
+  --sidebar-w:  320px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family:Inter,system-ui,sans-serif; color:var(--ink);
+  background:var(--paper); overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-faint)}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+#app{display:flex;flex-direction:column;height:100%}
+
+header.topbar{
+  display:flex;align-items:center;gap:18px;
+  padding:0 18px;height:62px;flex:none;
+  background:var(--paper);border-bottom:1px solid var(--line);
+  z-index:1200;position:relative;
+}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand h1{
+  font-family:Fraunces,Georgia,serif;font-weight:800;font-size:21px;
+  margin:0;letter-spacing:-.02em;white-space:nowrap;
+}
+.brand .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+.brand small{color:var(--ink-faint);font-size:12px;white-space:nowrap}
+
+.stats{display:flex;gap:22px;margin-left:auto}
+.stat{text-align:right;line-height:1.1}
+.stat b{display:block;font-family:Fraunces,serif;font-size:19px;font-weight:600}
+.stat span{font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint)}
+
+.topbar .actions{display:flex;gap:8px;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 15px;border-radius:999px;font-size:13.5px;font-weight:500;
+  border:1px solid var(--line);background:#fff;transition:.16s;white-space:nowrap;
+}
+.btn:hover{border-color:var(--ink-faint);transform:translateY(-1px)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:#a8461f}
+.btn.ghost{border-color:transparent;background:var(--paper-2)}
+.btn.icon{padding:9px;border-radius:10px}
+
+main{flex:1;position:relative;display:flex;min-height:0}
+
+/* ---------- Sidebar ---------- */
+#sidebar{
+  width:var(--sidebar-w);flex:none;background:var(--paper);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;
+  z-index:1100;transition:margin-left .32s cubic-bezier(.4,0,.2,1);
+}
+#sidebar.collapsed{margin-left:calc(-1 * var(--sidebar-w))}
+.search-wrap{padding:14px;border-bottom:1px solid var(--line)}
+.search{
+  width:100%;padding:10px 12px 10px 34px;border:1px solid var(--line);
+  border-radius:10px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%23938a7f' stroke-width='2.2' stroke-linecap='round'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg>") no-repeat 11px center;
+  font:inherit;font-size:13.5px;outline:none;
+}
+.search:focus{border-color:var(--accent)}
+.place-list{overflow-y:auto;flex:1;padding:6px 0 30px}
+.year-head{
+  font-family:Fraunces,serif;font-size:12px;font-weight:600;letter-spacing:.12em;
+  color:var(--ink-faint);padding:16px 18px 7px;text-transform:uppercase;
+}
+.place-item{
+  display:flex;gap:11px;width:100%;text-align:left;padding:9px 16px;
+  align-items:center;transition:background .14s;position:relative;
+}
+.place-item:hover{background:var(--paper-2)}
+.place-item.active{background:var(--paper-2)}
+.place-item.active::before{content:"";position:absolute;left:0;top:7px;bottom:7px;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.place-item .thumb{
+  width:44px;height:44px;border-radius:9px;object-fit:cover;flex:none;
+  background:var(--paper-2);border:1px solid var(--line);
+}
+.place-item .meta{min-width:0;flex:1}
+.place-item .meta b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.place-item .meta span{font-size:11.5px;color:var(--ink-faint);display:flex;gap:6px;align-items:center}
+.flag{font-size:13px}
+.empty{padding:40px 20px;text-align:center;color:var(--ink-faint);font-size:13px;line-height:1.6}
+
+#sidebarToggle{
+  position:absolute;top:12px;left:12px;z-index:1050;
+  background:#fff;box-shadow:var(--shadow);border:1px solid var(--line);
+  border-radius:10px;padding:9px 11px;display:none;
+}
+#sidebar.collapsed + #mapWrap #sidebarToggle{display:block}
+
+/* ---------- Map ---------- */
+#mapWrap{flex:1;position:relative;min-width:0}
+#map{position:absolute;inset:0;background:var(--paper-2)}
+.leaflet-container{font-family:Inter,sans-serif}
+.leaflet-control-zoom a{color:var(--ink)!important;border-color:var(--line)!important}
+.leaflet-bar{box-shadow:var(--shadow)!important;border:none!important}
+
+/* Custom pin */
+.pin{position:relative;width:30px;height:30px}
+.pin .head{
+  position:absolute;inset:0;border-radius:50% 50% 50% 8px;
+  transform:rotate(-45deg);background:var(--accent);
+  border:2.5px solid #fff;box-shadow:0 3px 10px rgba(29,26,23,.35);
+  transition:transform .18s, background .18s;
+  display:grid;place-items:center;
+}
+.pin .head i{transform:rotate(45deg);font-style:normal;font-size:13px;line-height:1}
+.pin:hover .head{transform:rotate(-45deg) scale(1.16)}
+.pin.sel .head{background:var(--accent-2);transform:rotate(-45deg) scale(1.2)}
+.pin.sel::after{
+  content:"";position:absolute;left:50%;top:50%;width:46px;height:46px;
+  margin:-23px 0 0 -23px;border-radius:50%;border:2px solid var(--accent-2);
+  animation:pulse 1.8s ease-out infinite;
+}
+@keyframes pulse{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+.leaflet-tooltip.pin-tip{
+  background:var(--ink);color:#fff;border:none;font-size:12px;font-weight:500;
+  padding:5px 9px;border-radius:7px;box-shadow:var(--shadow);
+}
+.leaflet-tooltip.pin-tip::before{border-top-color:var(--ink)}
+
+.route-line{stroke-dasharray:1 7;stroke-linecap:round}
+/* Satellite imagery is dark — lift the pin outline and attribution off it */
+body.sat .pin .head{border-width:3px;box-shadow:0 3px 14px rgba(0,0,0,.6)}
+body.sat .leaflet-control-attribution{background:rgba(255,255,255,.85)}
+
+/* Map legend / hint */
+.hint{
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  background:rgba(29,26,23,.9);color:#fff;padding:8px 15px;border-radius:999px;
+  font-size:12.5px;z-index:900;pointer-events:none;opacity:0;transition:opacity .3s;
+  white-space:nowrap;
+}
+.hint.show{opacity:1}
+
+/* ---------- Detail panel ---------- */
+#panel{
+  position:absolute;top:0;right:0;bottom:0;width:var(--panel-w);max-width:100%;
+  background:var(--paper);border-left:1px solid var(--line);
+  box-shadow:var(--shadow);z-index:1000;overflow-y:auto;
+  transform:translateX(102%);transition:transform .36s cubic-bezier(.4,0,.2,1);
+}
+#panel.open{transform:none}
+.panel-close{
+  position:sticky;top:0;float:right;margin:12px 12px 0 0;z-index:5;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+  border:1px solid var(--line);border-radius:50%;width:34px;height:34px;
+  display:grid;place-items:center;font-size:16px;line-height:1;
+}
+.panel-close:hover{background:#fff;color:var(--accent)}
+
+.hero{position:relative;height:250px;background:var(--paper-2);cursor:zoom-in;overflow:hidden}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.hero .scrim{position:absolute;inset:auto 0 0 0;height:60%;background:linear-gradient(transparent,rgba(0,0,0,.72))}
+.hero .cap{position:absolute;left:20px;right:20px;bottom:16px;color:#fff}
+.hero .cap h2{font-family:Fraunces,serif;font-size:30px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.08;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.hero .cap p{margin:5px 0 0;font-size:13px;opacity:.92}
+
+.panel-body{padding:22px 24px 44px}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
+.chip{
+  font-size:11.5px;padding:5px 11px;border-radius:999px;
+  background:var(--paper-2);border:1px solid var(--line);color:var(--ink-soft);
+}
+.chip.rating{background:#fff6e8;border-color:#f0d9b0;color:#8a5a12}
+
+h3.sec{
+  font-family:Fraunces,serif;font-size:13px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-faint);
+  margin:30px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--line);
+}
+h3.sec:first-of-type{margin-top:0}
+
+.prose{font-size:14.5px;line-height:1.75;color:var(--ink-soft)}
+.prose p{margin:0 0 14px}
+.prose p:first-child::first-letter{
+  font-family:Fraunces,serif;font-size:48px;font-weight:800;color:var(--accent);
+  float:left;line-height:.82;margin:4px 9px 0 0;
+}
+.prose strong{color:var(--ink)}
+
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.gallery img{
+  width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;cursor:zoom-in;
+  background:var(--paper-2);transition:.18s;
+}
+.gallery img:hover{transform:scale(1.03);filter:brightness(1.05)}
+
+.video{
+  position:relative;aspect-ratio:16/9;border-radius:11px;overflow:hidden;
+  background:#000;margin-bottom:10px;
+}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+.recs{display:flex;flex-direction:column;gap:9px}
+.rec{
+  display:flex;gap:11px;padding:11px 13px;background:#fff;
+  border:1px solid var(--line);border-radius:11px;transition:.16s;
+}
+.rec:hover{border-color:var(--ink-faint);transform:translateX(2px)}
+.rec .ico{font-size:17px;line-height:1.3}
+.rec b{display:block;font-size:13.5px;margin-bottom:2px}
+.rec p{margin:0;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.rec .kind{
+  font-size:10px;text-transform:uppercase;letter-spacing:.09em;
+  color:var(--ink-faint);margin-top:4px;
+}
+.rec a{color:var(--accent);text-decoration:none;font-size:12px}
+.rec a:hover{text-decoration:underline}
+
+.panel-foot{display:flex;gap:8px;margin-top:30px;padding-top:18px;border-top:1px solid var(--line)}
+
+/* ---------- Lightbox ---------- */
+#lightbox{
+  position:fixed;inset:0;background:rgba(16,14,12,.94);z-index:3000;
+  display:none;place-items:center;
+}
+#lightbox.open{display:grid}
+#lightbox img{max-width:92vw;max-height:84vh;border-radius:10px;box-shadow:0 20px 70px rgba(0,0,0,.6)}
+#lightbox .lb-nav{
+  position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:30px;
+  width:54px;height:54px;display:grid;place-items:center;border-radius:50%;
+  background:rgba(255,255,255,.1);transition:.15s;
+}
+#lightbox .lb-nav:hover{background:rgba(255,255,255,.22)}
+#lightbox .prev{left:18px} #lightbox .next{right:18px}
+#lightbox .lb-close{position:absolute;top:18px;right:20px;color:#fff;font-size:26px;opacity:.8}
+#lightbox .lb-count{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;font-size:12.5px;opacity:.75;letter-spacing:.06em}
+
+/* ---------- Modal (add place) ---------- */
+#modal{
+  position:fixed;inset:0;background:rgba(29,26,23,.5);z-index:2500;
+  display:none;place-items:center;padding:20px;backdrop-filter:blur(3px);
+}
+#modal.open{display:grid}
+.sheet{
+  background:var(--paper);border-radius:18px;box-shadow:var(--shadow);
+  width:min(560px,100%);max-height:88vh;overflow-y:auto;padding:26px 28px;
+}
+.sheet h2{font-family:Fraunces,serif;font-size:24px;font-weight:800;margin:0 0 4px;letter-spacing:-.02em}
+.sheet > p.sub{margin:0 0 22px;color:var(--ink-faint);font-size:13px}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;letter-spacing:.02em}
+.field .help{font-size:11.5px;color:var(--ink-faint);margin-top:4px;line-height:1.5}
+.field input,.field textarea,.field select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  font:inherit;font-size:13.5px;background:#fff;outline:none;color:var(--ink);
+}
+.field textarea{resize:vertical;min-height:84px;line-height:1.6}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.geo-wrap{display:flex;gap:8px}
+.geo-wrap input{flex:1}
+.geo-results{margin-top:7px;display:flex;flex-direction:column;gap:4px}
+.geo-results button{
+  text-align:left;padding:8px 11px;border-radius:9px;background:#fff;
+  border:1px solid var(--line);font-size:12.5px;line-height:1.4;
+}
+.geo-results button:hover{border-color:var(--accent);color:var(--accent)}
+/* ---- Photo upload ---- */
+.dropzone{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:20px 16px;border:1.5px dashed var(--line);border-radius:12px;
+  background:#fff;cursor:pointer;transition:.16s;text-align:center;outline:none;
+}
+.dropzone:hover,.dropzone:focus-visible{border-color:var(--accent);background:#fffdf9}
+.dropzone.over{border-color:var(--accent);background:#fff3ec;transform:scale(1.01)}
+.dropzone .dz-icon{font-size:22px;line-height:1}
+.dropzone b{font-size:13.5px}
+.dropzone span:last-child{font-size:11.5px;color:var(--ink-faint)}
+.dropzone.busy{opacity:.6;pointer-events:none}
+
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:7px;margin-top:9px}
+.thumbs:empty{display:none}
+.thumb-item{position:relative;aspect-ratio:1;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:var(--paper-2)}
+.thumb-item img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-item .rm{
+  position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;
+  background:rgba(20,18,16,.72);color:#fff;font-size:12px;line-height:1;
+  display:grid;place-items:center;opacity:0;transition:.14s;
+}
+.thumb-item:hover .rm{opacity:1}
+.thumb-item .rm:hover{background:var(--accent)}
+.thumb-item .cover{
+  position:absolute;left:0;bottom:0;right:0;background:rgba(20,18,16,.68);color:#fff;
+  font-size:9px;letter-spacing:.07em;text-transform:uppercase;text-align:center;padding:2px;
+}
+.thumb-item.link::after{content:"🔗";position:absolute;top:3px;left:4px;font-size:10px;opacity:.85}
+.url-add{display:flex;gap:7px;margin-top:9px}
+.url-add input{flex:1}
+
+/* ---- Publish ---- */
+#pubModal{
+  position:fixed;inset:0;background:rgba(29,26,23,.5);z-index:2600;
+  display:none;place-items:center;padding:20px;backdrop-filter:blur(3px);
+}
+#pubModal.open{display:grid}
+.pub-pending{
+  background:var(--paper-2);border:1px solid var(--line);border-radius:11px;
+  padding:11px 13px;font-size:12.5px;line-height:1.6;margin-bottom:18px;color:var(--ink-soft);
+}
+.pub-pending b{color:var(--ink)}
+.pub-pending.clean{background:#eef6f0;border-color:#cfe4d6}
+.pub-log{
+  display:none;margin:16px 0 0;padding:12px 13px;max-height:190px;overflow-y:auto;
+  background:#fffdf9;border:1px solid var(--line);border-radius:11px;
+  font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;
+  white-space:pre-wrap;word-break:break-word;color:var(--ink-soft);
+}
+.pub-log.show{display:block}
+.pub-log .ok{color:var(--accent-2)}
+.sheet-foot{display:flex;gap:9px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.sheet-foot .btn[disabled]{opacity:.5;pointer-events:none}
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:11px 20px;border-radius:999px;
+  font-size:13px;z-index:4000;opacity:0;transition:.26s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:860px){
+  :root{--panel-w:100%}
+  header.topbar{height:auto;padding:10px 14px;flex-wrap:wrap;gap:10px}
+  .brand h1{font-size:18px}
+  .brand small{display:none}
+  .stats{gap:16px;order:3;width:100%;justify-content:flex-start}
+  .stat{text-align:left}
+  #sidebar{position:absolute;inset:0 auto 0 0;box-shadow:var(--shadow)}
+  #sidebarToggle{display:block!important}
+  #panel{border-left:none}
+  .hero{height:210px}
+  .btn span.lbl{display:none}
+  .btn{padding:9px 11px}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Field Notes</h1>
+      <small>a travel journal</small>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="statPlaces">0</b><span>Places</span></div>
+      <div class="stat"><b id="statCountries">0</b><span>Countries</span></div>
+      <div class="stat"><b id="statPhotos">0</b><span>Photos</span></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost icon" id="btnFit" title="Zoom to fit all pins">🌍</button>
+      <button class="btn ghost icon" id="btnBase" title="Change map style">🗺️</button>
+      <button class="btn ghost icon" id="btnRoute" title="Toggle route lines">〰️</button>
+      <button class="btn ghost icon" id="btnRestore" style="display:none">↺</button>
+      <button class="btn ghost" id="btnPublish" title="Save your journal to GitHub"><span class="lbl">Publish</span> ☁</button>
+      <button class="btn ghost" id="btnExport" title="Download everything as a zip (entries + photos)"><span class="lbl">Export</span> ⬇</button>
+      <button class="btn primary" id="btnAdd">＋ <span class="lbl">Add place</span></button>
+    </div>
+  </header>
+
+  <main>
+    <aside id="sidebar">
+      <div class="search-wrap">
+        <input class="search" id="search" placeholder="Search places, countries, tags…" autocomplete="off">
+      </div>
+      <div class="place-list" id="placeList"></div>
+    </aside>
+
+    <div id="mapWrap">
+      <button id="sidebarToggle" title="Show list">☰</button>
+      <div id="map"></div>
+      <div class="hint" id="hint"></div>
+    </div>
+
+    <section id="panel" aria-live="polite"></section>
+  </main>
+</div>
+
+<!-- Lightbox -->
+<div id="lightbox">
+  <button class="lb-close" aria-label="Close">✕</button>
+  <button class="lb-nav prev" aria-label="Previous">‹</button>
+  <img id="lbImg" alt="">
+  <button class="lb-nav next" aria-label="Next">›</button>
+  <div class="lb-count" id="lbCount"></div>
+</div>
+
+<!-- Add place modal -->
+<div id="modal">
+  <div class="sheet">
+    <h2 id="modalTitle">Add a place</h2>
+    <p class="sub" id="modalSub">Drop a new pin on your map. Saved in this browser — use <b>Export</b> to keep a copy.</p>
+    <form id="addForm">
+      <div class="field">
+        <label>Find the location</label>
+        <div class="geo-wrap">
+          <input id="geoQuery" placeholder="e.g. Hoi An, Vietnam" autocomplete="off">
+          <button type="button" class="btn" id="geoBtn">Search</button>
+        </div>
+        <div class="geo-results" id="geoResults"></div>
+        <div class="help">Or close this and <b>double-click anywhere on the map</b> to pin that exact spot.</div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>Place name *</label><input id="fName" required placeholder="Hoi An"></div>
+        <div class="field"><label>Country</label><input id="fCountry" placeholder="Vietnam"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Latitude *</label><input id="fLat" required type="number" step="any" placeholder="15.8801"></div>
+        <div class="field"><label>Longitude *</label><input id="fLng" required type="number" step="any" placeholder="108.338"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>When</label><input id="fDate" type="month"></div>
+        <div class="field"><label>Pin emoji</label><input id="fEmoji" placeholder="🏮" maxlength="4"></div>
+      </div>
+
+      <div class="field">
+        <label>Rating</label>
+        <select id="fRating">
+          <option value="">No rating</option>
+          <option value="5">★★★★★</option>
+          <option value="4">★★★★☆</option>
+          <option value="3">★★★☆☆</option>
+          <option value="2">★★☆☆☆</option>
+          <option value="1">★☆☆☆☆</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Journal entry</label>
+        <textarea id="fStory" placeholder="What happened here? What did it smell like, taste like, sound like…"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Photos</label>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload photos">
+          <input type="file" id="fFiles" accept="image/*" multiple hidden>
+          <span class="dz-icon">🖼️</span>
+          <b>Click to choose photos</b>
+          <span>or drag them here &middot; JPG, PNG, HEIC, WebP</span>
+        </div>
+        <div class="thumbs" id="fThumbs"></div>
+        <div class="url-add">
+          <input id="fPhotoUrl" placeholder="…or paste an image URL / photos/kyoto-1.jpg" autocomplete="off">
+          <button type="button" class="btn" id="fPhotoUrlAdd">Add</button>
+        </div>
+        <div class="help" id="photoHelp">Large images are resized to 2000px to save space. The first photo becomes the cover.</div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>YouTube / Vimeo link</label><input id="fVideo" placeholder="https://youtu.be/…"></div>
+        <div class="field"><label>Tags</label><input id="fTags" placeholder="food, lanterns, river"></div>
+      </div>
+
+      <div class="field">
+        <label>Recommendations</label>
+        <textarea id="fRecs" placeholder="eat | Bánh mì Phượng | The sandwich that ruins all others&#10;stay | An Bang homestay | Ten minutes to an empty beach"></textarea>
+        <div class="help">One per line: <code>kind | name | note</code> — kind can be eat, stay, do, drink, or tip.</div>
+      </div>
+
+      <div class="sheet-foot">
+        <button type="button" class="btn" id="cancelAdd">Cancel</button>
+        <button type="submit" class="btn primary" id="modalSubmit">Drop pin</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Publish to GitHub -->
+<div id="pubModal">
+  <div class="sheet">
+    <h2>Publish</h2>
+    <p class="sub">Saves your journal to a GitHub repository. The live site rebuilds itself from there, so your entries show up on every computer.</p>
+
+    <div class="pub-pending" id="pubPending"></div>
+
+    <div class="row">
+      <div class="field"><label>GitHub username *</label><input id="ghOwner" placeholder="yourname" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label>Repository *</label><input id="ghRepo" placeholder="travel-journal" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="field">
+      <label>Branch</label>
+      <input id="ghBranch" placeholder="main" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Access token *</label>
+      <input id="ghToken" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false">
+      <div class="help">
+        Needs <b>Contents: Read and write</b> on this one repository.
+        Stored only in this browser — it is never written into your journal or committed.
+        <b>Each computer needs its own copy pasted in once.</b>
+      </div>
+    </div>
+
+    <pre class="pub-log" id="pubLog" aria-live="polite"></pre>
+
+    <div class="sheet-foot">
+      <button type="button" class="btn" id="pubClose">Close</button>
+      <button type="button" class="btn" id="pubCheck">Test connection</button>
+      <button type="button" class="btn primary" id="pubGo">Publish now</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+/* ============================================================================
+   1. YOUR TRIPS
+   ----------------------------------------------------------------------------
+   Edit this array to make entries permanent. Each entry:
+
+   { id, name, country, flag, emoji, lat, lng, date:"YYYY-MM",
+     rating: 1-5, tags:[], photos:[url], video:"youtube-or-vimeo url",
+     story:"supports **bold** and blank-line paragraphs",
+     recs:[{kind:"eat|stay|do|drink|tip", name, note, url}] }
+
+   Pins you add through the UI live in this browser's localStorage; hit Export
+   to download them and paste them in here for safekeeping.
+   ========================================================================== */
+const SEED_PLACES = [
+  {
+    id:"kyoto", name:"Kyoto", country:"Japan", flag:"🇯🇵", emoji:"⛩️",
+    lat:35.0116, lng:135.7681, date:"2024-04", rating:5,
+    tags:["cherry blossom","temples","slow mornings"],
+    photos:[
+      "https://picsum.photos/seed/kyoto-a/1400/900",
+      "https://picsum.photos/seed/kyoto-b/900/900",
+      "https://picsum.photos/seed/kyoto-c/900/900",
+      "https://picsum.photos/seed/kyoto-d/900/900",
+      "https://picsum.photos/seed/kyoto-e/900/900",
+      "https://picsum.photos/seed/kyoto-f/900/900"
+    ],
+    video:"https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    story:`We arrived the week the blossoms turned, which everyone will tell you is luck and nobody will tell you is also chaos. The trick we found by accident: be out by six. Philosopher's Path belongs to joggers and old men with cameras at that hour, and the petals come down the canal like something being delivered.
+
+By nine the city is a different animal. We learned to spend middays in **Nishiki Market** eating things we couldn't name, then retreat north to the quiet temples nobody queues for — Shisen-dō, Manshu-in — where the gardens are raked for an audience of four.
+
+The last night it rained hard. We sat under the eaves of a tiny bar in Pontochō with no English menu and pointed at what the man beside us was drinking. Best decision of the trip.`,
+    recs:[
+      {kind:"eat", name:"Nishiki Market", note:"Go hungry, go early, eat standing up. The tamagoyaki stall at the east end.", url:""},
+      {kind:"do", name:"Philosopher's Path at 6am", note:"Two kilometres of canal under cherry trees, entirely empty before seven.", url:""},
+      {kind:"do", name:"Fushimi Inari, after dark", note:"The torii gates are lit and almost deserted. Walk up past the first viewpoint — most people turn back there.", url:""},
+      {kind:"stay", name:"A machiya in Gion", note:"Old wooden townhouse, paper walls, a courtyard the size of a bath mat. Worth the stiff floors.", url:""},
+      {kind:"tip", name:"Get an IC card on arrival", note:"Buses are the real network here, not the subway, and the card saves endless coin-fumbling.", url:""}
+    ]
+  },
+  {
+    id:"lisbon", name:"Lisbon", country:"Portugal", flag:"🇵🇹", emoji:"🚋",
+    lat:38.7223, lng:-9.1393, date:"2023-09", rating:4,
+    tags:["tiles","seafood","hills"],
+    photos:[
+      "https://picsum.photos/seed/lisbon-a/1400/900",
+      "https://picsum.photos/seed/lisbon-b/900/900",
+      "https://picsum.photos/seed/lisbon-c/900/900",
+      "https://picsum.photos/seed/lisbon-d/900/900"
+    ],
+    video:"",
+    story:`A city that makes you earn every view. We walked roughly twelve kilometres a day, most of it vertical, and ate it all back in custard tarts.
+
+Alfama is the postcard, and it deserves to be, but the evening we remember was in **Graça** — a miradouro, a bottle of vinho verde bought from a kiosk, and a man playing fado to about nine people who all seemed to know him.`,
+    recs:[
+      {kind:"eat", name:"Cervejaria Ramiro", note:"Shellfish by weight, beer by the litre. Expect to queue; it's worth it. Finish with the steak sandwich.", url:""},
+      {kind:"drink", name:"Miradouro da Senhora do Monte", note:"Highest viewpoint in the city, least crowded. Bring your own bottle.", url:""},
+      {kind:"do", name:"Tram 28, but backwards", note:"Ride it from the far end at Martim Moniz to get a seat, or skip it and walk the route.", url:""},
+      {kind:"tip", name:"Shoes with grip", note:"The pavement is polished limestone. In rain it's an ice rink and that is not a joke.", url:""}
+    ]
+  },
+  {
+    id:"patagonia", name:"Torres del Paine", country:"Chile", flag:"🇨🇱", emoji:"🏔️",
+    lat:-50.9423, lng:-73.4068, date:"2023-02", rating:5,
+    tags:["hiking","wind","no signal"],
+    photos:[
+      "https://picsum.photos/seed/patagonia-a/1400/900",
+      "https://picsum.photos/seed/patagonia-b/900/900",
+      "https://picsum.photos/seed/patagonia-c/900/900"
+    ],
+    video:"",
+    story:`Five days on the W trek and four distinct seasons per afternoon. The wind here is not weather, it is a presence — it leans on you, it takes your words sideways, it flattens the lakes into hammered metal.
+
+Day three we got up at three in the morning to climb the moraine to the base of the towers in the dark. Sixty people shivering on rocks in silence, waiting. When the sun hit the granite it went the colour of a struck match and nobody said anything at all for about a minute. Then everyone started crying or laughing. **Worth every step.**`,
+    recs:[
+      {kind:"do", name:"Base of the Towers at sunrise", note:"Leave Chileno by 3:30am. Head torch, gloves, more layers than feels sane.", url:""},
+      {kind:"stay", name:"Refugio Grey", note:"Book months out. The deck looks straight onto the glacier and they sell beer.", url:""},
+      {kind:"tip", name:"Pack for all four seasons", note:"Sun, hail, and 90km/h wind in a single afternoon is a normal day, not a bad one.", url:""}
+    ]
+  },
+  {
+    id:"marrakech", name:"Marrakech", country:"Morocco", flag:"🇲🇦", emoji:"🫖",
+    lat:31.6295, lng:-7.9811, date:"2022-11", rating:4,
+    tags:["souks","rooftops","mint tea"],
+    photos:[
+      "https://picsum.photos/seed/marrakech-a/1400/900",
+      "https://picsum.photos/seed/marrakech-b/900/900",
+      "https://picsum.photos/seed/marrakech-c/900/900",
+      "https://picsum.photos/seed/marrakech-d/900/900"
+    ],
+    video:"",
+    story:`Sensory overload, in the good way and occasionally in the other way. The medina is a deliberate labyrinth and your phone's map will lie to you with total confidence.
+
+Our best hours were the quiet ones: the **Jardin Majorelle** at opening time, and long afternoons on the riad roof with a pot of tea while the call to prayer went up from four directions at slightly different times.`,
+    recs:[
+      {kind:"eat", name:"Jemaa el-Fnaa food stalls", note:"Pick the busiest one with the most locals. Stall numbers change; crowds don't lie.", url:""},
+      {kind:"stay", name:"Any riad inside the medina", note:"Courtyard, fountain, roof terrace. The temperature drop walking in from the street is magic.", url:""},
+      {kind:"do", name:"Jardin Majorelle at 8am", note:"First slot of the day, before the tour buses. Book online the night before.", url:""},
+      {kind:"tip", name:"Carry small notes", note:"Nobody has change, ever, and it's always somehow your problem.", url:""}
+    ]
+  },
+  {
+    id:"reykjavik", name:"Reykjavík & the Ring Road", country:"Iceland", flag:"🇮🇸", emoji:"❄️",
+    lat:64.1466, lng:-21.9426, date:"2022-03", rating:5,
+    tags:["aurora","road trip","hot springs"],
+    photos:[
+      "https://picsum.photos/seed/iceland-a/1400/900",
+      "https://picsum.photos/seed/iceland-b/900/900",
+      "https://picsum.photos/seed/iceland-c/900/900",
+      "https://picsum.photos/seed/iceland-d/900/900",
+      "https://picsum.photos/seed/iceland-e/900/900"
+    ],
+    video:"",
+    story:`Ten days, one small car, 2,400 kilometres and an almost religious relationship with the weather forecast site. We saw the aurora on night six, from a lay-by somewhere east of Vík, after four nights of cloud and quiet despair.
+
+The real surprise wasn't the famous stuff. It was the **public swimming pools** — every town has one, geothermal, open late, two euros, full of locals discussing the day in water hot enough to hurt.`,
+    recs:[
+      {kind:"do", name:"Local pools over the Blue Lagoon", note:"Hofsós and Laugardalslaug. A fraction of the price and nobody is filming themselves.", url:""},
+      {kind:"tip", name:"Check road.is and vedur.is daily", note:"Roads close without much warning. Plans here are suggestions.", url:""},
+      {kind:"do", name:"Drive the Snæfellsnes peninsula", note:"Iceland's greatest hits in one day loop, with a tenth of the crowds.", url:""},
+      {kind:"eat", name:"Petrol station hot dogs", note:"Unironically excellent. Order 'eina með öllu' — one with everything.", url:""}
+    ]
+  }
+];
+
+/* ============================================================================
+   2. STATE + STORAGE
+   ========================================================================== */
+/* Three stores, all in this browser:
+     added    — brand new pins you created
+     edits    — changes made to a SEED_PLACES entry, keyed by id (the file itself
+                is never touched, so your edits survive re-downloading it)
+     deleted  — ids of SEED_PLACES entries you hid                             */
+const LS = { added:"fieldNotes.places.v1", edits:"fieldNotes.edits.v1", deleted:"fieldNotes.deleted.v1" };
+
+const load = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+function persist(){
+  try {
+    localStorage.setItem(LS.added, JSON.stringify(userPlaces));
+    localStorage.setItem(LS.edits, JSON.stringify(edits));
+    localStorage.setItem(LS.deleted, JSON.stringify(deletedIds));
+  } catch { toast("Browser storage is full — export and trim your pins"); }
+  renderRestore();   // the ↺ button only shows when there's something to undo
+}
+
+/* ---- Uploaded photos -------------------------------------------------------
+   localStorage is ~5MB and strings only, so uploads go in IndexedDB as real
+   Blobs. A place stores the reference "idb:<key>" in its photos array; URLs and
+   relative paths still work exactly as before. At boot every blob gets one
+   object URL, cached here, so rendering stays synchronous.                   */
+const IDB = { name:"fieldNotesPhotos", store:"photos" };
+const photoCache = new Map();   // key -> object URL
+
+function idbOpen(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB.name, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(IDB.store);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbTx(mode, fn){
+  return idbOpen().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB.store, mode);
+    const req = fn(tx.objectStore(IDB.store));
+    tx.oncomplete = () => resolve(req?.result);
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+const idbPut = (key, blob) => idbTx("readwrite", s => s.put(blob, key));
+const idbDel = key          => idbTx("readwrite", s => s.delete(key));
+const idbGet = key          => idbTx("readonly",  s => s.get(key));
+
+// Load every stored blob once and hand out object URLs
+async function loadPhotoCache(){
+  try {
+    const entries = await idbTx("readonly", s => s.getAll());
+    const keys    = await idbTx("readonly", s => s.getAllKeys());
+    keys.forEach((k, i) => {
+      if (entries[i] instanceof Blob) photoCache.set(k, URL.createObjectURL(entries[i]));
+    });
+  } catch (e) {
+    console.warn("Photo store unavailable — uploaded images won't show", e);
+  }
+}
+
+/* Just-published photos: repo path -> local object URL. After publishing, a
+   photo's reference becomes photos/… but that file isn't served until Pages
+   finishes rebuilding, so for the next minute we keep showing the local copy
+   instead of a broken image. Not persisted — by the next reload the real file
+   is live. */
+const localByPath = new Map();
+
+/* Resolve a stored reference to something an <img src> can use. */
+const photoSrc = ref => {
+  if (typeof ref !== "string") return ref;
+  if (ref.startsWith("idb:")) return photoCache.get(ref.slice(4)) || "";
+  return localByPath.get(ref) || ref;
+};
+
+/* Shrink on import so a 12MP photo doesn't become a 6MB blob. Returns a Blob. */
+function downscale(file, maxEdge = 2000, quality = 0.85){
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+      if (scale === 1 && file.size < 900_000) return resolve(file);  // already small
+      const c = document.createElement("canvas");
+      c.width  = Math.round(img.width  * scale);
+      c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      c.toBlob(b => resolve(b || file), "image/jpeg", quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Not a readable image")); };
+    img.src = url;
+  });
+}
+
+/* Store one File, returning its "idb:…" reference. */
+async function importPhoto(file){
+  const blob = await downscale(file);
+  const key  = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+  await idbPut(key, blob);
+  photoCache.set(key, URL.createObjectURL(blob));
+  return `idb:${key}`;
+}
+
+/* Drop blobs no entry references any more (after edits and deletes). */
+async function gcPhotos(){
+  const inUse = new Set();
+  places.forEach(p => (p.photos || []).forEach(r => {
+    if (typeof r === "string" && r.startsWith("idb:")) inUse.add(r.slice(4));
+  }));
+  for (const key of [...photoCache.keys()]){
+    if (inUse.has(key)) continue;
+    URL.revokeObjectURL(photoCache.get(key));
+    photoCache.delete(key);
+    try { await idbDel(key); } catch {}
+  }
+}
+
+let userPlaces = load(LS.added, []);
+let edits      = load(LS.edits, {});
+let deletedIds = load(LS.deleted, []);
+let places = [];
+let markers = {};
+let selectedId = null;
+let routeLayer = null;
+let showRoute = false;
+
+/* The published journal. Served alongside this file as places.json; when that
+   isn't there (opened straight off disk, or not published yet) SEED_PLACES
+   stands in. Local edits layer on top of whichever one is in play.          */
+let basePlaces = SEED_PLACES;
+
+async function loadBase(){
+  try {
+    const r = await fetch(`places.json?v=${Date.now()}`, { cache:"no-store" });
+    if (!r.ok) return false;
+    const json = await r.json();
+    if (Array.isArray(json)) { basePlaces = json; return true; }
+  } catch { /* file:// or not published yet — demo entries stand in */ }
+  return false;
+}
+
+const isBaseEntry = id => basePlaces.some(p => p.id === id);
+
+function rebuild(){
+  const base = basePlaces
+    .filter(p => !deletedIds.includes(p.id))
+    .map(p => edits[p.id] ? { ...p, ...edits[p.id] } : p);
+  places = [...base, ...userPlaces].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+}
+rebuild();
+
+/* ============================================================================
+   3. MAP
+   ========================================================================== */
+const map = L.map("map", { zoomControl:false, worldCopyJump:true, minZoom:2 })
+  .setView([25, 10], 2.6);
+
+L.control.zoom({ position:"bottomright" }).addTo(map);
+
+/* Basemaps — all keyless and embeddable.
+   NOTE: openstreetmap.org's own tile servers are deliberately NOT used here.
+   Their usage policy forbids third-party apps and they serve an
+   "App not following tile policy" image instead of a map. Esri's ArcGIS Online
+   basemaps are free to use with attribution and work from file:// too. */
+const BASEMAPS = [
+  { name:"Streets", url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+    attr:"Tiles &copy; Esri", max:19 },
+  { name:"Muted",  url:"https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+    attr:"Tiles &copy; Esri", max:16, labels:"https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}" },
+  { name:"Terrain", url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+    attr:"Tiles &copy; Esri", max:19 },
+  { name:"Satellite", url:"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attr:"Tiles &copy; Esri, Maxar, Earthstar Geographics", max:19 }
+];
+
+let baseIdx = 0, baseLayer = null, labelLayer = null;
+
+function setBasemap(i){
+  const b = BASEMAPS[baseIdx = (i + BASEMAPS.length) % BASEMAPS.length];
+  if (baseLayer) map.removeLayer(baseLayer);
+  if (labelLayer){ map.removeLayer(labelLayer); labelLayer = null; }
+
+  baseLayer = L.tileLayer(b.url, { attribution:b.attr, maxZoom:19, maxNativeZoom:b.max }).addTo(map);
+  if (b.labels) labelLayer = L.tileLayer(b.labels, { maxZoom:19, maxNativeZoom:b.max, pane:"overlayPane" }).addTo(map);
+
+  // If a basemap starts failing, fall back to the next one automatically.
+  let errs = 0;
+  baseLayer.on("tileerror", () => {
+    if (++errs === 6 && baseIdx === i){
+      toast(`“${b.name}” tiles unavailable — switching basemap`);
+      setBasemap(baseIdx + 1);
+    }
+  });
+  document.body.classList.toggle("sat", b.name === "Satellite");
+}
+setBasemap(0);
+
+function pinIcon(place, selected){
+  return L.divIcon({
+    className:"", iconSize:[30,30], iconAnchor:[15,28], popupAnchor:[0,-26],
+    html:`<div class="pin${selected ? " sel" : ""}"><div class="head"><i>${place.emoji || "📍"}</i></div></div>`
+  });
+}
+
+function drawMarkers(){
+  Object.values(markers).forEach(m => map.removeLayer(m));
+  markers = {};
+  places.forEach(p => {
+    const m = L.marker([p.lat, p.lng], { icon: pinIcon(p, p.id === selectedId), riseOnHover:true })
+      .addTo(map)
+      .bindTooltip(`${p.flag || "📍"} ${p.name}`, { className:"pin-tip", direction:"top", offset:[0,-26] })
+      .on("click", () => select(p.id));
+    markers[p.id] = m;
+  });
+  drawRoute();
+}
+
+function drawRoute(){
+  if (routeLayer) { map.removeLayer(routeLayer); routeLayer = null; }
+  if (!showRoute || places.length < 2) return;
+  const pts = [...places].sort((a,b)=>(a.date||"").localeCompare(b.date||"")).map(p=>[p.lat,p.lng]);
+  routeLayer = L.polyline(pts, {
+    color:"#c2562e", weight:2, opacity:.55, className:"route-line"
+  }).addTo(map);
+}
+
+function fitAll(){
+  if (!places.length) return;
+  map.flyToBounds(L.latLngBounds(places.map(p=>[p.lat,p.lng])).pad(0.25), { duration:.9 });
+}
+
+/* ============================================================================
+   4. SELECTION + DETAIL PANEL
+   ========================================================================== */
+const panel = document.getElementById("panel");
+
+function select(id, { fly = true } = {}){
+  const prev = selectedId;
+  selectedId = id;
+  const p = places.find(x => x.id === id);
+  if (!p) return;
+
+  if (prev && markers[prev]) markers[prev].setIcon(pinIcon(places.find(x=>x.id===prev) || {}, false));
+  if (markers[id]) markers[id].setIcon(pinIcon(p, true));
+
+  if (fly){
+    const zoom = Math.max(map.getZoom(), 7);
+    // Shift the target left by half the detail panel so the pin isn't hidden
+    // behind it. Done in pixels at the DESTINATION zoom — doing it in degrees
+    // against the current viewport makes the offset explode at world zoom.
+    const shiftPx = window.innerWidth > 860
+      ? document.getElementById("panel").offsetWidth / 2
+      : 0;
+    // Push the centre EAST of the pin so the pin lands in the visible strip
+    // left of the panel (centre = pin + half the panel width).
+    const target = shiftPx
+      ? map.unproject(map.project([p.lat, p.lng], zoom).add([shiftPx, 0]), zoom)
+      : L.latLng(p.lat, p.lng);
+    map.flyTo(target, zoom, { duration:.85 });
+  }
+
+  renderPanel(p);
+  panel.classList.add("open");
+  renderList();
+}
+
+function deselect(){
+  if (selectedId && markers[selectedId]){
+    const p = places.find(x=>x.id===selectedId);
+    if (p) markers[selectedId].setIcon(pinIcon(p, false));
+  }
+  selectedId = null;
+  panel.classList.remove("open");
+  renderList();
+}
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function prose(text){
+  return esc(text).split(/\n{2,}/).map(par =>
+    `<p>${par.replace(/\n/g,"<br>").replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")}</p>`
+  ).join("");
+}
+
+function embedUrl(url){
+  if (!url) return "";
+  const yt = url.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  if (yt) return `https://www.youtube-nocookie.com/embed/${yt[1]}`;
+  const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  return "";
+}
+
+const KIND_ICON = { eat:"🍜", drink:"🍷", stay:"🛏️", do:"🧭", tip:"💡" };
+
+function fmtDate(d){
+  if (!d) return "";
+  const [y,m] = d.split("-");
+  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  return m ? `${months[+m-1]} ${y}` : y;
+}
+
+function renderPanel(p){
+  const photos = p.photos || [];
+  const video = embedUrl(p.video);
+  const recs = p.recs || [];
+  const edited = isBaseEntry(p.id) && !!edits[p.id];
+
+  panel.innerHTML = `
+    <button class="panel-close" id="panelClose" aria-label="Close">✕</button>
+    <div class="hero" ${photos[0] ? `data-i="0"` : ""}>
+      ${photos[0] ? `<img src="${esc(photoSrc(photos[0]))}" alt="${esc(p.name)}" loading="lazy">` : ""}
+      <div class="scrim"></div>
+      <div class="cap">
+        <h2>${esc(p.name)}</h2>
+        <p>${p.flag || ""} ${esc(p.country || "")}${p.date ? " · " + fmtDate(p.date) : ""}</p>
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="chips">
+        ${p.rating ? `<span class="chip rating">${"★".repeat(p.rating)}${"☆".repeat(5-p.rating)}</span>` : ""}
+        ${(p.tags||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join("")}
+      </div>
+
+      ${p.story ? `<h3 class="sec">The entry</h3><div class="prose">${prose(p.story)}</div>` : ""}
+
+      ${video ? `<h3 class="sec">Video</h3>
+        <div class="video"><iframe src="${video}" title="Video from ${esc(p.name)}" allowfullscreen loading="lazy"></iframe></div>` : ""}
+
+      ${photos.length > 1 ? `<h3 class="sec">Photos <span style="color:var(--ink-faint);font-weight:400">(${photos.length})</span></h3>
+        <div class="gallery">${photos.map((src,i)=>`<img src="${esc(photoSrc(src))}" data-i="${i}" alt="${esc(p.name)} ${i+1}" loading="lazy">`).join("")}</div>` : ""}
+
+      ${recs.length ? `<h3 class="sec">Recommendations</h3>
+        <div class="recs">${recs.map(r=>`
+          <div class="rec">
+            <div class="ico">${KIND_ICON[r.kind] || "📌"}</div>
+            <div>
+              <b>${esc(r.name)}</b>
+              ${r.note ? `<p>${esc(r.note)}</p>` : ""}
+              <div class="kind">${esc(r.kind || "note")}</div>
+              ${r.url ? `<a href="${esc(r.url)}" target="_blank" rel="noopener">Open link ↗</a>` : ""}
+            </div>
+          </div>`).join("")}</div>` : ""}
+
+      <div class="panel-foot">
+        <button class="btn primary" id="btnEdit">✎ Edit</button>
+        <button class="btn" id="btnDirections">Open in Maps ↗</button>
+        ${edited ? `<button class="btn" id="btnRevert" title="Discard your changes to this built-in entry">↺ Revert</button>` : ""}
+        <button class="btn" id="btnDelete" style="color:var(--accent)">Delete</button>
+      </div>
+    </div>`;
+
+  panel.scrollTop = 0;
+  panel.querySelector("#panelClose").onclick = deselect;
+  panel.querySelector("#btnDirections").onclick = () =>
+    window.open(`https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}`, "_blank", "noopener");
+
+  panel.querySelector("#btnEdit").onclick = () => openModal({ editId: p.id });
+
+  panel.querySelector("#btnDelete").onclick = () => {
+    const seed = isBaseEntry(p.id);
+    const msg = seed
+      ? `Hide the built-in entry "${p.name}"? You can bring it back with Restore built-ins.`
+      : `Delete "${p.name}" from your journal? This can't be undone.`;
+    if (!confirm(msg)) return;
+    if (seed){ deletedIds.push(p.id); delete edits[p.id]; }
+    else userPlaces = userPlaces.filter(u => u.id !== p.id);
+    persist(); rebuild(); deselect(); drawMarkers(); renderList(); renderStats(); gcPhotos();
+    toast(seed ? "Entry hidden" : "Pin deleted");
+  };
+
+  const revert = panel.querySelector("#btnRevert");
+  if (revert) revert.onclick = () => {
+    if (!confirm(`Discard your changes to "${p.name}" and restore the original?`)) return;
+    delete edits[p.id];
+    persist(); rebuild(); drawMarkers(); renderList(); renderStats(); gcPhotos();
+    select(p.id, { fly:false });
+    toast("Reverted to the original entry");
+  };
+
+  // Lightbox wiring
+  panel.querySelectorAll(".hero[data-i], .gallery img").forEach(el => {
+    el.onclick = () => openLightbox(photos, +el.dataset.i || 0);
+  });
+}
+
+/* ============================================================================
+   5. SIDEBAR LIST
+   ========================================================================== */
+const listEl = document.getElementById("placeList");
+const searchEl = document.getElementById("search");
+
+function renderList(){
+  const q = searchEl.value.trim().toLowerCase();
+  const matches = places.filter(p => !q || [
+    p.name, p.country, (p.tags||[]).join(" "), p.story, (p.recs||[]).map(r=>r.name+" "+r.note).join(" ")
+  ].join(" ").toLowerCase().includes(q));
+
+  if (!matches.length){
+    listEl.innerHTML = `<div class="empty">${q ? `Nothing matches “${esc(q)}”.` : "No places yet.<br>Hit <b>＋ Add place</b> to start."}</div>`;
+    return;
+  }
+
+  const groups = {};
+  matches.forEach(p => { const y = (p.date||"").slice(0,4) || "Undated"; (groups[y] ||= []).push(p); });
+
+  listEl.innerHTML = Object.keys(groups).sort((a,b)=>b.localeCompare(a)).map(year => `
+    <div class="year-head">${esc(year)}</div>
+    ${groups[year].map(p => `
+      <button class="place-item${p.id===selectedId?" active":""}" data-id="${esc(p.id)}">
+        ${p.photos?.[0]
+          ? `<img class="thumb" src="${esc(photoSrc(p.photos[0]))}" alt="" loading="lazy">`
+          : `<div class="thumb" style="display:grid;place-items:center;font-size:18px">${p.emoji||"📍"}</div>`}
+        <div class="meta">
+          <b>${esc(p.name)}</b>
+          <span><span class="flag">${p.flag||"📍"}</span> ${esc(p.country||"")} ${p.photos?.length ? `· ${p.photos.length} 📷` : ""}</span>
+        </div>
+      </button>`).join("")}
+  `).join("");
+
+  listEl.querySelectorAll(".place-item").forEach(btn => {
+    btn.onclick = () => {
+      select(btn.dataset.id);
+      if (window.innerWidth <= 860) document.getElementById("sidebar").classList.add("collapsed");
+    };
+  });
+}
+
+function renderStats(){
+  document.getElementById("statPlaces").textContent = places.length;
+  document.getElementById("statCountries").textContent = new Set(places.map(p=>p.country).filter(Boolean)).size;
+  document.getElementById("statPhotos").textContent = places.reduce((n,p)=>n+(p.photos?.length||0),0);
+}
+
+searchEl.addEventListener("input", renderList);
+
+/* ============================================================================
+   6. LIGHTBOX
+   ========================================================================== */
+const lb = document.getElementById("lightbox");
+const lbImg = document.getElementById("lbImg");
+const lbCount = document.getElementById("lbCount");
+let lbList = [], lbIdx = 0;
+
+function openLightbox(list, i){
+  if (!list?.length) return;
+  lbList = list; lbIdx = i;
+  showLb();
+  lb.classList.add("open");
+}
+function showLb(){
+  lbImg.src = photoSrc(lbList[lbIdx]);
+  lbCount.textContent = `${lbIdx+1} / ${lbList.length}`;
+}
+const lbStep = d => { lbIdx = (lbIdx + d + lbList.length) % lbList.length; showLb(); };
+
+lb.querySelector(".lb-close").onclick = () => lb.classList.remove("open");
+lb.querySelector(".prev").onclick = e => { e.stopPropagation(); lbStep(-1); };
+lb.querySelector(".next").onclick = e => { e.stopPropagation(); lbStep(1); };
+lb.onclick = e => { if (e.target === lb) lb.classList.remove("open"); };
+
+document.addEventListener("keydown", e => {
+  if (lb.classList.contains("open")){
+    if (e.key === "Escape") lb.classList.remove("open");
+    if (e.key === "ArrowLeft") lbStep(-1);
+    if (e.key === "ArrowRight") lbStep(1);
+    return;
+  }
+  if (e.key === "Escape"){
+    if (document.getElementById("pubModal").classList.contains("open")) document.getElementById("pubModal").classList.remove("open");
+    else if (document.getElementById("modal").classList.contains("open")) closeModal();
+    else if (panel.classList.contains("open")) deselect();
+  }
+});
+
+/* ============================================================================
+   7. ADD / EDIT PLACE
+   ========================================================================== */
+const modal = document.getElementById("modal");
+let editingId = null;   // null = creating a new pin
+
+/* openModal()                      → blank form, new pin
+   openModal({ lat, lng })          → new pin at that spot
+   openModal({ editId:"kyoto" })    → form pre-filled with that entry        */
+function openModal(opts = {}){
+  const { lat, lng, editId = null } = opts;
+  editingId = editId;
+  addForm.reset();
+  geoResults.innerHTML = "";
+  setFormPhotos([]);          // form.reset() can't clear the photo widget
+
+  const p = editId ? places.find(x => x.id === editId) : null;
+  if (p) fillForm(p);
+  else if (lat != null){ fLat.value = (+lat).toFixed(5); fLng.value = (+lng).toFixed(5); }
+
+  modalTitle.textContent = p ? "Edit entry" : "Add a place";
+  modalSub.innerHTML = p
+    ? `Changes are saved in this browser and leave <code>travel-journal.html</code> untouched${isBaseEntry(p.id) ? " — the original stays recoverable with <b>Revert</b>" : ""}.`
+    : `Drop a new pin on your map. Saved in this browser — use <b>Export</b> to keep a copy.`;
+  modalSubmit.textContent = p ? "Save changes" : "Drop pin";
+
+  modal.classList.add("open");
+  setTimeout(()=> (p || lat != null ? fName : geoQuery).focus(), 60);
+}
+
+/* ---- Photo field state ---------------------------------------------------
+   formPhotos holds references in display order: "idb:…" for uploads, or a
+   plain URL / relative path. Uploads are written to IndexedDB as soon as
+   they're chosen, and gcPhotos() reclaims any that never get saved.        */
+let formPhotos = [];
+
+function setFormPhotos(list){
+  formPhotos = [...list];
+  renderThumbs();
+}
+
+function renderThumbs(){
+  fThumbs.innerHTML = formPhotos.map((ref, i) => `
+    <div class="thumb-item${ref.startsWith("idb:") ? "" : " link"}">
+      <img src="${esc(photoSrc(ref))}" alt="">
+      ${i === 0 ? `<div class="cover">Cover</div>` : ""}
+      <button type="button" class="rm" data-i="${i}" title="Remove">✕</button>
+    </div>`).join("");
+
+  fThumbs.querySelectorAll(".rm").forEach(b => {
+    b.onclick = () => { formPhotos.splice(+b.dataset.i, 1); renderThumbs(); };
+  });
+  photoHelp.textContent = formPhotos.length
+    ? `${formPhotos.length} photo${formPhotos.length === 1 ? "" : "s"} · the first one is the cover · drag more in any time`
+    : "Large images are resized to 2000px to save space. The first photo becomes the cover.";
+}
+
+async function addFiles(fileList){
+  const files = [...fileList].filter(f => f.type.startsWith("image/") || /\.(hei[cf]|jpe?g|png|webp|gif|avif)$/i.test(f.name));
+  if (!files.length) return toast("No readable image files in that drop");
+
+  dropzone.classList.add("busy");
+  let ok = 0, failed = 0;
+  for (const f of files){
+    try { formPhotos.push(await importPhoto(f)); ok++; renderThumbs(); }
+    catch { failed++; }
+  }
+  dropzone.classList.remove("busy");
+
+  if (ok)     toast(`${ok} photo${ok === 1 ? "" : "s"} added`);
+  if (failed) toast(`${failed} file${failed === 1 ? "" : "s"} couldn't be read${/hei/i.test(files.map(f=>f.name).join()) ? " — HEIC may need converting to JPG" : ""}`);
+}
+
+dropzone.onclick = () => fFiles.click();
+dropzone.onkeydown = e => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); fFiles.click(); } };
+fFiles.onchange = () => { addFiles(fFiles.files); fFiles.value = ""; };
+
+["dragenter","dragover"].forEach(ev => dropzone.addEventListener(ev, e => {
+  e.preventDefault(); dropzone.classList.add("over");
+}));
+["dragleave","drop"].forEach(ev => dropzone.addEventListener(ev, e => {
+  e.preventDefault(); if (ev === "dragleave" && dropzone.contains(e.relatedTarget)) return;
+  dropzone.classList.remove("over");
+}));
+dropzone.addEventListener("drop", e => { if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
+
+const addPhotoUrl = () => {
+  const v = fPhotoUrl.value.trim();
+  if (!v) return;
+  formPhotos.push(v); fPhotoUrl.value = ""; renderThumbs();
+};
+fPhotoUrlAdd.onclick = addPhotoUrl;
+fPhotoUrl.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); addPhotoUrl(); }});
+
+// Turn a place object back into the textarea/input formats the form uses
+function fillForm(p){
+  fName.value    = p.name || "";
+  fCountry.value = p.country || "";
+  fLat.value     = p.lat ?? "";
+  fLng.value     = p.lng ?? "";
+  fDate.value    = p.date || "";
+  fEmoji.value   = p.emoji || "";
+  fRating.value  = p.rating || "";
+  fStory.value   = p.story || "";
+  setFormPhotos(p.photos || []);
+  fVideo.value   = p.video || "";
+  fTags.value    = (p.tags || []).join(", ");
+  fRecs.value    = (p.recs || [])
+    .map(r => [r.kind || "tip", r.name, r.note].filter(Boolean).join(" | "))
+    .join("\n");
+}
+
+const closeModal = () => {
+  modal.classList.remove("open"); editingId = null;
+  addForm.reset(); geoResults.innerHTML = "";
+  setFormPhotos([]);
+  gcPhotos();   // reclaim uploads from a cancelled form
+};
+
+document.getElementById("btnAdd").onclick = () => openModal();
+document.getElementById("cancelAdd").onclick = closeModal;
+modal.onclick = e => { if (e.target === modal) closeModal(); };
+
+// Double-click the map to pin that exact spot
+map.on("dblclick", e => { map.doubleClickZoom.disable(); openModal({ lat:e.latlng.lat, lng:e.latlng.lng }); setTimeout(()=>map.doubleClickZoom.enable(), 400); });
+
+// Geocoding via OpenStreetMap Nominatim (no key required)
+geoBtn.onclick = async () => {
+  const q = geoQuery.value.trim();
+  if (!q) return;
+  geoResults.innerHTML = `<div class="help">Searching…</div>`;
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(q)}`, { headers:{ "Accept":"application/json" }});
+    const data = await r.json();
+    if (!data.length){ geoResults.innerHTML = `<div class="help">No match. Try a bigger nearby city, or pin it by double-clicking the map.</div>`; return; }
+    geoResults.innerHTML = "";
+    data.forEach(d => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = d.display_name;
+      b.onclick = () => {
+        fLat.value = (+d.lat).toFixed(5);
+        fLng.value = (+d.lon).toFixed(5);
+        const parts = d.display_name.split(",").map(s=>s.trim());
+        if (!fName.value) fName.value = parts[0];
+        if (!fCountry.value) fCountry.value = parts[parts.length-1];
+        geoResults.innerHTML = `<div class="help">📍 Pinned at ${fLat.value}, ${fLng.value}</div>`;
+      };
+      geoResults.appendChild(b);
+    });
+  } catch {
+    geoResults.innerHTML = `<div class="help">Lookup failed (offline?). Enter coordinates manually or double-click the map.</div>`;
+  }
+};
+geoQuery.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); geoBtn.click(); }});
+
+addForm.addEventListener("submit", e => {
+  e.preventDefault();
+
+  const country = fCountry.value.trim();
+  const fields = {
+    name: fName.value.trim(),
+    country,
+    emoji: fEmoji.value.trim() || "📍",
+    lat: +fLat.value, lng: +fLng.value,
+    date: fDate.value,
+    rating: fRating.value ? +fRating.value : undefined,
+    tags: fTags.value.split(",").map(s=>s.trim()).filter(Boolean),
+    photos: [...formPhotos],
+    video: fVideo.value.trim(),
+    story: fStory.value.trim(),
+    recs: fRecs.value.split("\n").map(l=>l.trim()).filter(Boolean).map(line => {
+      const [kind, name, note] = line.split("|").map(s=>(s||"").trim());
+      return { kind:(kind||"tip").toLowerCase(), name: name || kind, note: note || "" };
+    }).filter(r => r.name)
+  };
+  if (fields.rating === undefined) delete fields.rating;
+
+  if (editingId){
+    const current = places.find(x => x.id === editingId);
+    // Only re-derive the flag if the country actually changed, so a hand-picked
+    // flag in SEED_PLACES isn't clobbered on an unrelated edit.
+    if (country !== (current?.country || "")) fields.flag = flagFor(country);
+
+    if (isBaseEntry(editingId)) edits[editingId] = { ...(edits[editingId] || {}), ...fields };
+    else {
+      const i = userPlaces.findIndex(u => u.id === editingId);
+      if (i > -1) userPlaces[i] = { ...userPlaces[i], ...fields };
+    }
+    const id = editingId;
+    persist(); rebuild(); drawMarkers(); renderStats(); renderList(); closeModal();
+    select(id, { fly:false });
+    toast(`✓ ${fields.name} updated`);
+    return;
+  }
+
+  const slug = (fields.name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "place");
+  const place = { id:`${slug}-${Date.now().toString(36)}`, flag:flagFor(country), ...fields };
+  userPlaces.push(place);
+  persist(); rebuild(); drawMarkers(); renderStats(); closeModal(); select(place.id);
+  toast(`📍 ${place.name} added to your journal`);
+});
+
+// Rough country → flag emoji (handles the common cases; falls back to a pin)
+const COUNTRY_CODES = {japan:"JP",portugal:"PT",chile:"CL",morocco:"MA",iceland:"IS",france:"FR",italy:"IT",spain:"ES",mexico:"MX",india:"IN",thailand:"TH",vietnam:"VN",peru:"PE",greece:"GR",turkey:"TR","united states":"US",usa:"US",uk:"GB","united kingdom":"GB",germany:"DE",norway:"NO",sweden:"SE",kenya:"KE","south africa":"ZA",australia:"AU","new zealand":"NZ",brazil:"BR",argentina:"AR",canada:"CA",china:"CN","south korea":"KR",indonesia:"ID",egypt:"EG",nepal:"NP",croatia:"HR",netherlands:"NL",switzerland:"CH",austria:"AT",ireland:"IE",colombia:"CO",cuba:"CU",jordan:"JO",georgia:"GE",taiwan:"TW",philippines:"PH",malaysia:"MY",sricanka:"LK","sri lanka":"LK"};
+function flagFor(country){
+  const code = COUNTRY_CODES[country.toLowerCase()];
+  if (!code) return "📍";
+  return String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
+/* ============================================================================
+   8. TOOLBAR + MISC
+   ========================================================================== */
+document.getElementById("btnFit").onclick = fitAll;
+
+document.getElementById("btnBase").onclick = () => {
+  setBasemap(baseIdx + 1);
+  toast(`Map style: ${BASEMAPS[baseIdx].name}`);
+};
+
+document.getElementById("btnRoute").onclick = e => {
+  showRoute = !showRoute;
+  e.currentTarget.style.background = showRoute ? "var(--accent)" : "";
+  drawRoute();
+  toast(showRoute ? "Route shown in travel order" : "Route hidden");
+};
+
+/* ---- ZIP writer -----------------------------------------------------------
+   Store-only (no deflate): JPEG/PNG are already compressed, so this costs
+   nothing in size and saves pulling in a zip library. Enough of the spec to
+   produce an archive any unzip tool accepts.                               */
+function crc32(buf){
+  if (!crc32.table){
+    crc32.table = new Uint32Array(256);
+    for (let n = 0; n < 256; n++){
+      let c = n;
+      for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      crc32.table[n] = c >>> 0;
+    }
+  }
+  let crc = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) crc = (crc >>> 8) ^ crc32.table[(crc ^ buf[i]) & 0xFF];
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+
+function makeZip(entries){
+  const enc = new TextEncoder();
+  const parts = [], central = [];
+  let offset = 0;
+
+  for (const { name, data } of entries){
+    const nameBytes = enc.encode(name);
+    const crc = crc32(data);
+
+    const local = new Uint8Array(30 + nameBytes.length);
+    const lv = new DataView(local.buffer);
+    lv.setUint32(0, 0x04034b50, true);   // local file header
+    lv.setUint16(4, 20, true);           // version needed
+    lv.setUint16(6, 0x0800, true);       // UTF-8 filename flag
+    lv.setUint16(8, 0, true);            // method: store
+    lv.setUint16(10, 0, true);           // mod time
+    lv.setUint16(12, 0x2821, true);      // mod date
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, data.length, true); // compressed size
+    lv.setUint32(22, data.length, true); // uncompressed size
+    lv.setUint16(26, nameBytes.length, true);
+    local.set(nameBytes, 30);
+    parts.push(local, data);
+
+    const cd = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(cd.buffer);
+    cv.setUint32(0, 0x02014b50, true);   // central directory header
+    cv.setUint16(4, 20, true);           // version made by
+    cv.setUint16(6, 20, true);           // version needed
+    cv.setUint16(8, 0x0800, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0x2821, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, data.length, true);
+    cv.setUint32(24, data.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint32(42, offset, true);      // offset of local header
+    cd.set(nameBytes, 46);
+    central.push(cd);
+
+    offset += local.length + data.length;
+  }
+
+  const cdSize = central.reduce((n, c) => n + c.length, 0);
+  const end = new Uint8Array(22);
+  const ev = new DataView(end.buffer);
+  ev.setUint32(0, 0x06054b50, true);     // end of central directory
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, offset, true);
+
+  return new Blob([...parts, ...central, end], { type:"application/zip" });
+}
+
+const EXT = { "image/png":".png", "image/webp":".webp", "image/gif":".gif", "image/avif":".avif" };
+
+/* Exports every entry on the map — your own pins and built-ins with your edits
+   applied — as a zip holding places.json plus the actual photo files, with
+   "idb:…" references rewritten to photos/… paths so the result is portable. */
+async function exportArchive(){
+  const btn = document.getElementById("btnExport");
+  btn.disabled = true;
+  try {
+    toast("Packing your journal…");
+    const files = [];
+    const seen = new Map();   // idb key -> photos/<file>
+
+    // Pull each referenced blob once, naming it after the entry it belongs to
+    for (const p of places){
+      for (const ref of p.photos || []){
+        const r = String(ref);
+        if (!r.startsWith("idb:") || seen.has(r.slice(4))) continue;
+        const key = r.slice(4);
+        const blob = await idbGet(key);
+        if (!blob) continue;
+        const base = (p.id || "photo").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+        const name = `photos/${base}-${key}${EXT[blob.type] || ".jpg"}`;
+        seen.set(key, name);
+        files.push({ name, data: new Uint8Array(await blob.arrayBuffer()) });
+      }
+    }
+
+    const out = places.map(p => ({
+      ...p,
+      photos: (p.photos || []).map(ref => {
+        const r = String(ref);
+        return r.startsWith("idb:") ? (seen.get(r.slice(4)) || r) : r;
+      })
+    }));
+
+    const enc = new TextEncoder();
+    files.push({ name:"places.json", data: enc.encode(JSON.stringify(out, null, 2)) });
+    files.push({ name:"README.txt", data: enc.encode(
+`Field Notes export — ${new Date().toISOString().slice(0,10)}
+${out.length} entries, ${seen.size} uploaded photo${seen.size === 1 ? "" : "s"}
+
+To make this permanent in travel-journal.html:
+
+1. Unzip this archive next to travel-journal.html, so that the
+   photos/ folder sits in the same directory as the HTML file.
+
+2. Open travel-journal.html in a text editor and find the line
+   starting with:  const SEED_PLACES = [
+
+3. Replace everything between the [ and the matching ]; with the
+   contents of places.json (drop its outer [ and ] if you prefer,
+   just keep the entry objects).
+
+4. Save. Your entries and photos now live in the file itself and
+   will work on any machine, in any browser, with no setup.
+
+Photo paths in places.json are already relative (photos/...), so
+they resolve correctly as long as you keep the folder alongside
+the HTML file.
+`)});
+
+    const blob = makeZip(files);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `field-notes-${new Date().toISOString().slice(0,10)}.zip`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+
+    const mb = (blob.size / 1048576).toFixed(blob.size > 1048576 ? 1 : 2);
+    toast(`Exported ${out.length} entries + ${seen.size} photo${seen.size === 1 ? "" : "s"} (${mb} MB) — see README.txt inside`);
+  } catch (e){
+    console.error(e);
+    toast("Export failed — see the browser console");
+  } finally {
+    btn.disabled = false;
+  }
+}
+document.getElementById("btnExport").onclick = exportArchive;
+
+// Only meaningful once something has been hidden or edited
+function renderRestore(){
+  const n = deletedIds.length + Object.keys(edits).length;
+  const btn = document.getElementById("btnRestore");
+  btn.style.display = n ? "inline-flex" : "none";
+  btn.title = `Undo your changes to ${n} built-in ${n === 1 ? "entry" : "entries"}`;
+}
+document.getElementById("btnRestore").onclick = () => {
+  const n = deletedIds.length + Object.keys(edits).length;
+  if (!confirm(`Restore all ${n} built-in ${n === 1 ? "entry" : "entries"} to their original state? Your own pins are not affected.`)) return;
+  deletedIds = []; edits = {};
+  persist(); rebuild(); deselect(); drawMarkers(); renderList(); renderStats(); renderRestore();
+  toast("Built-in entries restored");
+};
+
+document.getElementById("sidebarToggle").onclick = () =>
+  document.getElementById("sidebar").classList.toggle("collapsed");
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 2600);
+}
+
+function hint(msg){
+  const h = document.getElementById("hint");
+  h.textContent = msg; h.classList.add("show");
+  setTimeout(()=>h.classList.remove("show"), 5000);
+}
+
+/* ============================================================================
+   9. PUBLISH TO GITHUB
+   ----------------------------------------------------------------------------
+   Writes places.json and any uploaded photos to a repo as ONE commit, using the
+   Git Data API (blobs → tree → commit → move the branch). One commit rather
+   than one-per-file keeps the history readable and means a half-finished
+   publish never lands. GitHub Pages redeploys from that commit.
+   ========================================================================== */
+const CFG_KEY = "fieldNotes.github.v1";
+let gh = load(CFG_KEY, { owner:"", repo:"", branch:"main", token:"" });
+
+function ghFormFill(){
+  ghOwner.value = gh.owner || "";
+  ghRepo.value = gh.repo || "";
+  ghBranch.value = gh.branch || "main";
+  ghToken.value = gh.token || "";
+}
+function ghFormRead(){
+  gh = {
+    owner: ghOwner.value.trim().replace(/^@/, ""),
+    repo: ghRepo.value.trim().replace(/^.*\//, ""),
+    branch: ghBranch.value.trim() || "main",
+    token: ghToken.value.trim()
+  };
+  localStorage.setItem(CFG_KEY, JSON.stringify(gh));
+  return gh;
+}
+
+async function ghApi(path, opts = {}){
+  const r = await fetch(`https://api.github.com${path}`, {
+    ...opts,
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": `Bearer ${gh.token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(opts.body ? { "Content-Type": "application/json" } : {}),
+      ...(opts.headers || {})
+    }
+  });
+  if (!r.ok){
+    let detail = `${r.status} ${r.statusText}`;
+    try { const j = await r.json(); if (j.message) detail = j.message; } catch {}
+    const err = new Error(detail);
+    err.status = r.status;
+    throw err;
+  }
+  return r.status === 204 ? null : r.json();
+}
+
+// btoa() needs a binary string; chunked so large photos don't blow the stack
+function toBase64(bytes){
+  let s = "";
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) s += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+  return btoa(s);
+}
+
+const pubLogEl = document.getElementById("pubLog");
+function plog(msg, cls = ""){
+  pubLogEl.classList.add("show");
+  const line = document.createElement("span");
+  if (cls) line.className = cls;
+  line.textContent = msg + "\n";
+  pubLogEl.appendChild(line);
+  pubLogEl.scrollTop = pubLogEl.scrollHeight;
+}
+
+/* What's waiting to be published, in plain language. */
+function renderPending(){
+  const uploads = places.reduce((n,p)=>n + (p.photos||[]).filter(r=>String(r).startsWith("idb:")).length, 0);
+  const localChanges = userPlaces.length + Object.keys(edits).length + deletedIds.length;
+  const el = document.getElementById("pubPending");
+  if (!localChanges && !uploads){
+    el.className = "pub-pending clean";
+    el.innerHTML = `Nothing waiting — everything here matches what's published.`;
+    return;
+  }
+  el.className = "pub-pending";
+  el.innerHTML = `Waiting to publish: <b>${places.length}</b> entries` +
+    (userPlaces.length ? ` · <b>${userPlaces.length}</b> new` : "") +
+    (Object.keys(edits).length ? ` · <b>${Object.keys(edits).length}</b> edited` : "") +
+    (deletedIds.length ? ` · <b>${deletedIds.length}</b> removed` : "") +
+    (uploads ? ` · <b>${uploads}</b> photo${uploads===1?"":"s"} to upload` : "");
+}
+
+async function ghCheck(){
+  ghFormRead();
+  pubLogEl.innerHTML = ""; pubLogEl.classList.remove("show");
+  if (!gh.owner || !gh.repo || !gh.token) return plog("Fill in username, repository and token first.");
+  const btn = document.getElementById("pubCheck"); btn.disabled = true;
+  try {
+    plog(`Checking ${gh.owner}/${gh.repo} …`);
+    const repo = await ghApi(`/repos/${gh.owner}/${gh.repo}`);
+    plog(`✓ Found repository (${repo.private ? "private" : "public"})`, "ok");
+    if (!repo.permissions?.push) plog("⚠ This token can read but not write. Give it Contents: Read and write.");
+    await ghApi(`/repos/${gh.owner}/${gh.repo}/git/ref/heads/${gh.branch}`);
+    plog(`✓ Branch "${gh.branch}" exists`, "ok");
+    plog(`✓ Ready to publish`, "ok");
+  } catch (e){
+    plog(`✗ ${e.message}`);
+    if (e.status === 404) plog("A 404 here usually means the repository name is wrong, or the token isn't granted access to this repository.");
+    if (e.status === 401) plog("401 means the token is wrong or expired.");
+  } finally { btn.disabled = false; }
+}
+
+async function ghPublish(){
+  ghFormRead();
+  pubLogEl.innerHTML = ""; pubLogEl.classList.remove("show");
+  if (!gh.owner || !gh.repo || !gh.token) return plog("Fill in username, repository and token first.");
+
+  const go = document.getElementById("pubGo");
+  go.disabled = true;
+  const base = `/repos/${gh.owner}/${gh.repo}`;
+
+  try {
+    plog(`Reading branch "${gh.branch}" …`);
+    const ref = await ghApi(`${base}/git/ref/heads/${gh.branch}`);
+    const headSha = ref.object.sha;
+    const headCommit = await ghApi(`${base}/git/commits/${headSha}`);
+    plog(`✓ At ${headSha.slice(0,7)}`, "ok");
+
+    // Upload each uploaded photo as a git blob
+    const tree = [];
+    const renamed = new Map();           // idb key -> photos/… path
+    for (const p of places){
+      for (const r0 of p.photos || []){
+        const r = String(r0);
+        if (!r.startsWith("idb:")) continue;
+        const key = r.slice(4);
+        if (renamed.has(key)) continue;
+        const blob = await idbGet(key);
+        if (!blob){ plog(`⚠ Photo ${key} missing locally, skipping`); continue; }
+        const stem = (p.id || "photo").replace(/[^a-z0-9-]/gi, "-").toLowerCase();
+        const path = `photos/${stem}-${key}${EXT[blob.type] || ".jpg"}`;
+        plog(`Uploading ${path} (${Math.round(blob.size/1024)} KB) …`);
+        const made = await ghApi(`${base}/git/blobs`, {
+          method:"POST",
+          body: JSON.stringify({ content: toBase64(new Uint8Array(await blob.arrayBuffer())), encoding:"base64" })
+        });
+        tree.push({ path, mode:"100644", type:"blob", sha: made.sha });
+        renamed.set(key, path);
+        // Own object URL, so the cleanup pass below can't revoke it out from under us
+        localByPath.set(path, URL.createObjectURL(blob));
+      }
+    }
+    if (renamed.size) plog(`✓ ${renamed.size} photo${renamed.size===1?"":"s"} uploaded`, "ok");
+
+    // places.json, with uploads rewritten to their repo paths
+    const out = places.map(p => ({
+      ...p,
+      photos: (p.photos || []).map(r0 => {
+        const r = String(r0);
+        return r.startsWith("idb:") ? (renamed.get(r.slice(4)) || r) : r;
+      })
+    }));
+    const jsonBlob = await ghApi(`${base}/git/blobs`, {
+      method:"POST",
+      body: JSON.stringify({
+        content: toBase64(new TextEncoder().encode(JSON.stringify(out, null, 2))),
+        encoding:"base64"
+      })
+    });
+    tree.push({ path:"places.json", mode:"100644", type:"blob", sha: jsonBlob.sha });
+
+    plog("Building commit …");
+    const newTree = await ghApi(`${base}/git/trees`, {
+      method:"POST",
+      body: JSON.stringify({ base_tree: headCommit.tree.sha, tree })
+    });
+    const commit = await ghApi(`${base}/git/commits`, {
+      method:"POST",
+      body: JSON.stringify({
+        message: `Journal update — ${out.length} entries, ${renamed.size} new photo${renamed.size===1?"":"s"}`,
+        tree: newTree.sha,
+        parents: [headSha]
+      })
+    });
+    await ghApi(`${base}/git/refs/heads/${gh.branch}`, {
+      method:"PATCH",
+      body: JSON.stringify({ sha: commit.sha })
+    });
+    plog(`✓ Committed ${commit.sha.slice(0,7)}`, "ok");
+
+    /* The repo is now the source of truth. Clearing the local overlay is what
+       stops the next load showing every entry twice (once from places.json,
+       once from this browser's "new pins" list). */
+    basePlaces = out;
+    userPlaces = []; edits = {}; deletedIds = [];
+    persist(); rebuild(); drawMarkers(); renderList(); renderStats(); renderRestore();
+    await gcPhotos();
+    renderPending();
+    if (selectedId){
+      const still = places.find(x => x.id === selectedId);
+      still ? renderPanel(still) : deselect();
+    }
+
+    plog("", "");
+    plog(`Published. GitHub Pages usually takes 30–60 seconds to rebuild, then`, "ok");
+    plog(`the new version is live for everyone.`, "ok");
+    toast("☁ Published to GitHub");
+  } catch (e){
+    plog(`✗ ${e.message}`);
+    if (e.status === 409) plog("409 means the branch moved since this page loaded — reload and publish again.");
+    if (e.status === 403) plog("403 is usually a token without Contents: Read and write.");
+    plog("Nothing was changed on GitHub; your journal is still safe in this browser.");
+  } finally { go.disabled = false; }
+}
+
+const pubModal = document.getElementById("pubModal");
+document.getElementById("btnPublish").onclick = () => {
+  ghFormFill(); renderPending();
+  pubLogEl.innerHTML = ""; pubLogEl.classList.remove("show");
+  pubModal.classList.add("open");
+  setTimeout(() => (gh.token ? document.getElementById("pubGo") : ghOwner).focus(), 60);
+};
+document.getElementById("pubClose").onclick = () => pubModal.classList.remove("open");
+document.getElementById("pubCheck").onclick = ghCheck;
+document.getElementById("pubGo").onclick = ghPublish;
+pubModal.onclick = e => { if (e.target === pubModal) pubModal.classList.remove("open"); };
+
+/* ============================================================================
+   10. BOOT
+   ========================================================================== */
+/* Paint immediately from whatever is in memory, then refresh once the two
+   async sources (published places.json, uploaded photo blobs) have landed. */
+drawMarkers();
+renderList();
+renderStats();
+renderRestore();
+
+Promise.all([loadBase(), loadPhotoCache()]).then(([published]) => {
+  if (published) rebuild();
+  drawMarkers();
+  renderList();
+  renderStats();
+  renderRestore();
+  if (selectedId){
+    const p = places.find(x => x.id === selectedId);
+    p ? renderPanel(p) : deselect();
+  }
+  if (published) setTimeout(fitAll, 150);
+});
+setTimeout(fitAll, 500);
+setTimeout(()=>hint("Click a pin to read the entry · double-click the map to add your own"), 1400);
+</script>
+</body>
+</html>
