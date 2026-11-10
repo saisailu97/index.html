@@ -1,6 +1,6 @@
 [
   {
-    "id": "rome-mw9t7guu",
+    "id": "rome-mw9yzqkf",
     "flag": "🇮🇹",
     "name": "Rome",
     "country": "Italy",
@@ -15,7 +15,7 @@
     "recs": []
   },
   {
-    "id": "florence-mw9t7nrg",
+    "id": "florence-mw9yzw1n",
     "flag": "🇮🇹",
     "name": "Florence",
     "country": "Italy",
@@ -30,7 +30,7 @@
     "recs": []
   },
   {
-    "id": "san-francisco-mw9tg1bd",
+    "id": "san-francisco-mw9z1dtr",
     "flag": "🇺🇸",
     "name": "San Francisco",
     "country": "United States",
@@ -45,28 +45,13 @@
     "recs": []
   },
   {
-    "id": "tulum-mw9tdm36",
-    "flag": "🇲🇽",
-    "name": "Tulum",
-    "country": "Mexico",
-    "emoji": "📍",
-    "lat": 20.42965,
-    "lng": -87.65293,
-    "date": "2026-05",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "hong-kong-mw9t46vm",
+    "id": "hong-kong-mw9z35ay",
     "flag": "🇨🇳",
     "name": "Hong Kong",
     "country": "China",
     "emoji": "📍",
-    "lat": 22.34924,
-    "lng": 114.18578,
+    "lat": 22.28183,
+    "lng": 114.15828,
     "date": "2026-04",
     "tags": [],
     "photos": [],
@@ -75,7 +60,7 @@
     "recs": []
   },
   {
-    "id": "visakhapatnam-mw9t4zna",
+    "id": "visakhapatnam-mw9yy687",
     "flag": "🇮🇳",
     "name": "Visakhapatnam",
     "country": "India",
@@ -90,13 +75,13 @@
     "recs": []
   },
   {
-    "id": "shimla-mw9t5cd5",
+    "id": "hyderabad-mw9yxtd8",
     "flag": "🇮🇳",
-    "name": "Shimla",
+    "name": "Hyderabad",
     "country": "India",
     "emoji": "📍",
-    "lat": 31.10404,
-    "lng": 77.17079,
+    "lat": 17.38879,
+    "lng": 78.46106,
     "date": "2026-02",
     "tags": [],
     "photos": [],
@@ -105,7 +90,22 @@
     "recs": []
   },
   {
-    "id": "bengaluru-mw9tn55j",
+    "id": "shimla-mw9z1x47",
+    "flag": "🇮🇳",
+    "name": "Shimla",
+    "country": "India",
+    "emoji": "📍",
+    "lat": 31.23877,
+    "lng": 77.71857,
+    "date": "2026-02",
+    "tags": [],
+    "photos": [],
+    "video": "",
+    "story": "",
+    "recs": []
+  },
+  {
+    "id": "bengaluru-mw9zkhlh",
     "flag": "🇮🇳",
     "name": "Bengaluru",
     "country": "India",
@@ -120,7 +120,22 @@
     "recs": []
   },
   {
-    "id": "gangtok-mw9t5k4d",
+    "id": "ibiza-mw9zk2ml",
+    "flag": "🇪🇸",
+    "name": "Ibiza",
+    "country": "Spain",
+    "emoji": "📍",
+    "lat": 38.97439,
+    "lng": 1.41975,
+    "date": "2025-09",
+    "tags": [],
+    "photos": [],
+    "video": "",
+    "story": "",
+    "recs": []
+  },
+  {
+    "id": "gangtok-mw9z28jb",
     "flag": "🇮🇳",
     "name": "Gangtok",
     "country": "India",
@@ -135,7 +150,22 @@
     "recs": []
   },
   {
-    "id": "darjeeling-mw9t60ke",
+    "id": "pelling-mw9z2l7t",
+    "flag": "🇮🇳",
+    "name": "Pelling",
+    "country": "India",
+    "emoji": "📍",
+    "lat": 27.30037,
+    "lng": 88.23565,
+    "date": "2025-04",
+    "tags": [],
+    "photos": [],
+    "video": "",
+    "story": "",
+    "recs": []
+  },
+  {
+    "id": "darjeeling-mw9z6ot8",
     "flag": "🇮🇳",
     "name": "Darjeeling",
     "country": "India",
@@ -144,73 +174,16 @@
     "lng": 88.30589,
     "date": "2025-04",
     "tags": [],
-    "photos": [],
+    "photos": [
+      "photos/darjeeling-mw9z6ot8-mw9zr6d1-bce9gw.jpg",
+      "photos/darjeeling-mw9z6ot8-mw9zr6ke-7jy1zt.jpg"
+    ],
     "video": "",
     "story": "",
     "recs": []
   },
   {
-    "id": "sikkim-mw9tm57l",
-    "flag": "🇮🇳",
-    "name": "Sikkim",
-    "country": "India",
-    "emoji": "📍",
-    "lat": 27.60154,
-    "lng": 88.4546,
-    "date": "2025-04",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "chicago-mw9tlcnu",
-    "flag": "🇺🇸",
-    "name": "Chicago",
-    "country": "United States",
-    "emoji": "📍",
-    "lat": 41.87556,
-    "lng": -87.62442,
-    "date": "2025-03",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "canc-n-mw9tdecv",
-    "flag": "🇲🇽",
-    "name": "Cancún",
-    "country": "Mexico",
-    "emoji": "📍",
-    "lat": 21.15275,
-    "lng": -86.84258,
-    "date": "2025-01",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "toronto-mw9tcxe8",
-    "flag": "🇨🇦",
-    "name": "Toronto",
-    "country": "Canada",
-    "emoji": "📍",
-    "lat": 43.65348,
-    "lng": -79.38393,
-    "date": "2024-05",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "frankfurt-mw9tc1n9",
+    "id": "frankfurt-mw9z488c",
     "flag": "🇩🇪",
     "name": "Frankfurt",
     "country": "Germany",
@@ -225,7 +198,7 @@
     "recs": []
   },
   {
-    "id": "mexico-city-mw9tq4x5",
+    "id": "mexico-city-mw9yxjew",
     "flag": "🇲🇽",
     "name": "Mexico City",
     "country": "Mexico",
@@ -240,7 +213,7 @@
     "recs": []
   },
   {
-    "id": "amritsar-mw9t6riu",
+    "id": "amritsar-mw9z2xe8",
     "flag": "🇮🇳",
     "name": "Amritsar",
     "country": "India",
@@ -255,7 +228,7 @@
     "recs": []
   },
   {
-    "id": "srinagar-mw9t8930",
+    "id": "srinagar-mw9z5s9g",
     "flag": "🇮🇳",
     "name": "Srinagar",
     "country": "India",
@@ -264,43 +237,16 @@
     "lng": 74.82044,
     "date": "2024-01",
     "tags": [],
-    "photos": [],
+    "photos": [
+      "photos/srinagar-mw9z5s9g-mw9zw72s-2rgox5.jpg",
+      "photos/srinagar-mw9z5s9g-mw9zw77a-w1yg04.jpg"
+    ],
     "video": "",
     "story": "",
     "recs": []
   },
   {
-    "id": "sonamarg-mw9tnkp9",
-    "flag": "🇮🇳",
-    "name": "Sonamarg",
-    "country": "India",
-    "emoji": "📍",
-    "lat": 34.30239,
-    "lng": 75.29656,
-    "date": "2024-01",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "gulmarg-mw9tntod",
-    "flag": "🇮🇳",
-    "name": "Gulmarg",
-    "country": "India",
-    "emoji": "📍",
-    "lat": 34.04897,
-    "lng": 74.39212,
-    "date": "2024-01",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "goa-mw9tlqfp",
+    "id": "goa-mw9yyegy",
     "flag": "🇮🇳",
     "name": "Goa",
     "country": "India",
@@ -309,13 +255,66 @@
     "lng": 74.08551,
     "date": "2023-12",
     "tags": [],
-    "photos": [],
+    "photos": [
+      "photos/goa-mw9yyegy-mw9zush6-26bkj0.jpg",
+      "photos/goa-mw9yyegy-mw9zusl5-3r7q99.jpg"
+    ],
     "video": "",
     "story": "",
     "recs": []
   },
   {
-    "id": "split-mw9tcjs0",
+    "id": "lisbon",
+    "name": "Lisbon",
+    "country": "Portugal",
+    "flag": "🇵🇹",
+    "emoji": "🚋",
+    "lat": 38.7223,
+    "lng": -9.1393,
+    "date": "2023-09",
+    "rating": 4,
+    "tags": [
+      "tiles",
+      "seafood",
+      "hills"
+    ],
+    "photos": [
+      "https://picsum.photos/seed/lisbon-a/1400/900",
+      "https://picsum.photos/seed/lisbon-b/900/900",
+      "https://picsum.photos/seed/lisbon-c/900/900",
+      "https://picsum.photos/seed/lisbon-d/900/900"
+    ],
+    "video": "",
+    "story": "A city that makes you earn every view. We walked roughly twelve kilometres a day, most of it vertical, and ate it all back in custard tarts.\n\nAlfama is the postcard, and it deserves to be, but the evening we remember was in **Graça** — a miradouro, a bottle of vinho verde bought from a kiosk, and a man playing fado to about nine people who all seemed to know him.",
+    "recs": [
+      {
+        "kind": "eat",
+        "name": "Cervejaria Ramiro",
+        "note": "Shellfish by weight, beer by the litre. Expect to queue; it's worth it. Finish with the steak sandwich.",
+        "url": ""
+      },
+      {
+        "kind": "drink",
+        "name": "Miradouro da Senhora do Monte",
+        "note": "Highest viewpoint in the city, least crowded. Bring your own bottle.",
+        "url": ""
+      },
+      {
+        "kind": "do",
+        "name": "Tram 28, but backwards",
+        "note": "Ride it from the far end at Martim Moniz to get a seat, or skip it and walk the route.",
+        "url": ""
+      },
+      {
+        "kind": "tip",
+        "name": "Shoes with grip",
+        "note": "The pavement is polished limestone. In rain it's an ice rink and that is not a joke.",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "split-mw9yzjoa",
     "flag": "🇭🇷",
     "name": "Split",
     "country": "Croatia",
@@ -330,7 +329,7 @@
     "recs": []
   },
   {
-    "id": "vienna-mw9teta7",
+    "id": "vienna-mw9z7eyf",
     "flag": "🇦🇹",
     "name": "Vienna",
     "country": "Austria",
@@ -345,7 +344,7 @@
     "recs": []
   },
   {
-    "id": "mumbai-mw9t4p29",
+    "id": "mumbai-mw9z7nne",
     "flag": "🇮🇳",
     "name": "Mumbai",
     "country": "India",
@@ -410,7 +409,7 @@
     ]
   },
   {
-    "id": "prague-mw9tbtjk",
+    "id": "prague-mw9yyndb",
     "flag": "📍",
     "name": "Prague",
     "country": "Czechia",
@@ -425,7 +424,7 @@
     "recs": []
   },
   {
-    "id": "berlin-mw9tf5al",
+    "id": "berlin-mw9yz4f7",
     "flag": "🇩🇪",
     "name": "Berlin",
     "country": "Germany",
@@ -440,7 +439,7 @@
     "recs": []
   },
   {
-    "id": "nashville-mw9tkzmt",
+    "id": "nashville-mw9za3l4",
     "flag": "🇺🇸",
     "name": "Nashville",
     "country": "United States",
@@ -455,68 +454,7 @@
     "recs": []
   },
   {
-    "id": "lisbon",
-    "name": "Lisbon",
-    "country": "Portugal",
-    "flag": "🇵🇹",
-    "emoji": "🚋",
-    "lat": 38.7223,
-    "lng": -9.1393,
-    "date": "2022-09",
-    "rating": 4,
-    "tags": [
-      "tiles",
-      "seafood",
-      "hills"
-    ],
-    "photos": [
-      "https://picsum.photos/seed/lisbon-a/1400/900",
-      "https://picsum.photos/seed/lisbon-b/900/900",
-      "https://picsum.photos/seed/lisbon-c/900/900",
-      "https://picsum.photos/seed/lisbon-d/900/900"
-    ],
-    "video": "",
-    "story": "A city that makes you earn every view. We walked roughly twelve kilometres a day, most of it vertical, and ate it all back in custard tarts.\n\nAlfama is the postcard, and it deserves to be, but the evening we remember was in **Graça** — a miradouro, a bottle of vinho verde bought from a kiosk, and a man playing fado to about nine people who all seemed to know him.",
-    "recs": [
-      {
-        "kind": "eat",
-        "name": "Cervejaria Ramiro",
-        "note": "Shellfish by weight, beer by the litre. Expect to queue; it's worth it. Finish with the steak sandwich."
-      },
-      {
-        "kind": "drink",
-        "name": "Miradouro da Senhora do Monte",
-        "note": "Highest viewpoint in the city, least crowded. Bring your own bottle."
-      },
-      {
-        "kind": "do",
-        "name": "Tram 28, but backwards",
-        "note": "Ride it from the far end at Martim Moniz to get a seat, or skip it and walk the route."
-      },
-      {
-        "kind": "tip",
-        "name": "Shoes with grip",
-        "note": "The pavement is polished limestone. In rain it's an ice rink and that is not a joke."
-      }
-    ]
-  },
-  {
-    "id": "porto-mw9t8t1z",
-    "flag": "🇵🇹",
-    "name": "Porto",
-    "country": "Portugal",
-    "emoji": "📍",
-    "lat": 41.15022,
-    "lng": -8.61035,
-    "date": "2022-09",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "fez-mw9tse3s",
+    "id": "fez-mw9yxbfe",
     "flag": "🇲🇦",
     "name": "Fez",
     "country": "Morocco",
@@ -531,22 +469,7 @@
     "recs": []
   },
   {
-    "id": "chefchaouen-mw9tsqke",
-    "flag": "🇲🇦",
-    "name": "Chefchaouen",
-    "country": "Morocco",
-    "emoji": "📍",
-    "lat": 35.16877,
-    "lng": -5.26835,
-    "date": "2022-09",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "kuala-lumpur-mw9tar9t",
+    "id": "kuala-lumpur-mw9yvw7v",
     "flag": "🇲🇾",
     "name": "Kuala Lumpur",
     "country": "Malaysia",
@@ -561,7 +484,7 @@
     "recs": []
   },
   {
-    "id": "bangkok-mw9tbe87",
+    "id": "bangkok-mw9yw47d",
     "flag": "🇹🇭",
     "name": "Bangkok",
     "country": "Thailand",
@@ -576,7 +499,7 @@
     "recs": []
   },
   {
-    "id": "singapore-mw9t9555",
+    "id": "singapore-mw9yvjvw",
     "flag": "📍",
     "name": "Singapore",
     "country": "Singapore",
@@ -591,7 +514,22 @@
     "recs": []
   },
   {
-    "id": "punta-cana-mw9t75kd",
+    "id": "toronto-mw9z1lzr",
+    "flag": "🇨🇦",
+    "name": "Toronto",
+    "country": "Canada",
+    "emoji": "📍",
+    "lat": 43.65348,
+    "lng": -79.38393,
+    "date": "2022-07",
+    "tags": [],
+    "photos": [],
+    "video": "",
+    "story": "",
+    "recs": []
+  },
+  {
+    "id": "punta-cana-mw9z4to3",
     "flag": "📍",
     "name": "Punta Cana",
     "country": "Dominican Republic",
@@ -606,22 +544,7 @@
     "recs": []
   },
   {
-    "id": "seattle-mw9tgaix",
-    "flag": "🇺🇸",
-    "name": "Seattle",
-    "country": "United States",
-    "emoji": "📍",
-    "lat": 47.60383,
-    "lng": -122.33006,
-    "date": "2022-02",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "madrid-mw9t7zxf",
+    "id": "madrid-mw9ysf2r",
     "flag": "🇪🇸",
     "name": "Madrid",
     "country": "Spain",
@@ -636,22 +559,7 @@
     "recs": []
   },
   {
-    "id": "chennai-mw9tgs4o",
-    "flag": "🇮🇳",
-    "name": "Chennai",
-    "country": "India",
-    "emoji": "📍",
-    "lat": 13.08009,
-    "lng": 80.2808,
-    "date": "2020-01",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "new-delhi-mw9txzq5",
+    "id": "new-delhi-mw9z0x3x",
     "flag": "🇮🇳",
     "name": "New Delhi",
     "country": "India",
@@ -666,7 +574,22 @@
     "recs": []
   },
   {
-    "id": "london-mw9sxbkh",
+    "id": "chennai-mw9z15tc",
+    "flag": "🇮🇳",
+    "name": "Chennai",
+    "country": "India",
+    "emoji": "📍",
+    "lat": 13.08009,
+    "lng": 80.2808,
+    "date": "2020-01",
+    "tags": [],
+    "photos": [],
+    "video": "",
+    "story": "",
+    "recs": []
+  },
+  {
+    "id": "london-mw9yqg9r",
     "flag": "🇬🇧",
     "name": "London",
     "country": "United Kingdom",
@@ -681,13 +604,13 @@
     "recs": []
   },
   {
-    "id": "paris-mw9t18ra",
+    "id": "paris-mw9yr0bx",
     "flag": "🇫🇷",
     "name": "Paris",
     "country": "France",
     "emoji": "📍",
-    "lat": 48.85889,
-    "lng": 2.32004,
+    "lat": 48.8535,
+    "lng": 2.34839,
     "date": "2018-11",
     "tags": [],
     "photos": [],
@@ -696,7 +619,22 @@
     "recs": []
   },
   {
-    "id": "brussels-mw9t2uaj",
+    "id": "barcelona-mw9z3qvc",
+    "flag": "🇪🇸",
+    "name": "Barcelona",
+    "country": "Spain",
+    "emoji": "📍",
+    "lat": 41.38258,
+    "lng": 2.17707,
+    "date": "2018-11",
+    "tags": [],
+    "photos": [],
+    "video": "",
+    "story": "",
+    "recs": []
+  },
+  {
+    "id": "brussels-mw9z403r",
     "flag": "📍",
     "name": "Brussels",
     "country": "Belgium",
@@ -711,22 +649,7 @@
     "recs": []
   },
   {
-    "id": "barcelona-mw9t3hd5",
-    "flag": "🇪🇸",
-    "name": "Barcelona",
-    "country": "Spain",
-    "emoji": "📍",
-    "lat": 41.75787,
-    "lng": 2.03118,
-    "date": "2018-11",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "manchester-mw9thngx",
+    "id": "manchester-mw9z8dzj",
     "flag": "🇬🇧",
     "name": "Manchester",
     "country": "United Kingdom",
@@ -741,28 +664,13 @@
     "recs": []
   },
   {
-    "id": "new-orleans-mw9tqy88",
-    "flag": "🇺🇸",
-    "name": "New Orleans",
-    "country": "United States",
-    "emoji": "📍",
-    "lat": 29.95747,
-    "lng": -90.06295,
-    "date": "2018-10",
-    "tags": [],
-    "photos": [],
-    "video": "",
-    "story": "",
-    "recs": []
-  },
-  {
-    "id": "mysuru-mw9tms6g",
+    "id": "mysuru-mw9z0nke",
     "flag": "🇮🇳",
     "name": "Mysuru",
     "country": "India",
     "emoji": "📍",
-    "lat": 12.30415,
-    "lng": 76.65295,
+    "lat": 12.30518,
+    "lng": 76.65536,
     "date": "",
     "tags": [],
     "photos": [],
