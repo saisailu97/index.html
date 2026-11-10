@@ -1,0 +1,254 @@
+[
+  {
+    "id": "kyoto",
+    "name": "Kyoto",
+    "country": "Japan",
+    "flag": "🇯🇵",
+    "emoji": "⛩️",
+    "lat": 35.0116,
+    "lng": 135.7681,
+    "date": "2024-04",
+    "rating": 5,
+    "tags": [
+      "cherry blossom",
+      "temples",
+      "slow mornings"
+    ],
+    "photos": [
+      "https://picsum.photos/seed/kyoto-a/1400/900",
+      "https://picsum.photos/seed/kyoto-b/900/900",
+      "https://picsum.photos/seed/kyoto-c/900/900",
+      "https://picsum.photos/seed/kyoto-d/900/900",
+      "https://picsum.photos/seed/kyoto-e/900/900",
+      "https://picsum.photos/seed/kyoto-f/900/900"
+    ],
+    "video": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    "story": "We arrived the week the blossoms turned, which everyone will tell you is luck and nobody will tell you is also chaos. The trick we found by accident: be out by six. Philosopher's Path belongs to joggers and old men with cameras at that hour, and the petals come down the canal like something being delivered.\n\nBy nine the city is a different animal. We learned to spend middays in **Nishiki Market** eating things we couldn't name, then retreat north to the quiet temples nobody queues for — Shisen-dō, Manshu-in — where the gardens are raked for an audience of four.\n\nThe last night it rained hard. We sat under the eaves of a tiny bar in Pontochō with no English menu and pointed at what the man beside us was drinking. Best decision of the trip.",
+    "recs": [
+      {
+        "kind": "eat",
+        "name": "Nishiki Market",
+        "note": "Go hungry, go early, eat standing up. The tamagoyaki stall at the east end.",
+        "url": ""
+      },
+      {
+        "kind": "do",
+        "name": "Philosopher's Path at 6am",
+        "note": "Two kilometres of canal under cherry trees, entirely empty before seven.",
+        "url": ""
+      },
+      {
+        "kind": "do",
+        "name": "Fushimi Inari, after dark",
+        "note": "The torii gates are lit and almost deserted. Walk up past the first viewpoint — most people turn back there.",
+        "url": ""
+      },
+      {
+        "kind": "stay",
+        "name": "A machiya in Gion",
+        "note": "Old wooden townhouse, paper walls, a courtyard the size of a bath mat. Worth the stiff floors.",
+        "url": ""
+      },
+      {
+        "kind": "tip",
+        "name": "Get an IC card on arrival",
+        "note": "Buses are the real network here, not the subway, and the card saves endless coin-fumbling.",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "lisbon",
+    "name": "Lisbon",
+    "country": "Portugal",
+    "flag": "🇵🇹",
+    "emoji": "🚋",
+    "lat": 38.7223,
+    "lng": -9.1393,
+    "date": "2023-09",
+    "rating": 4,
+    "tags": [
+      "tiles",
+      "seafood",
+      "hills"
+    ],
+    "photos": [
+      "https://picsum.photos/seed/lisbon-a/1400/900",
+      "https://picsum.photos/seed/lisbon-b/900/900",
+      "https://picsum.photos/seed/lisbon-c/900/900",
+      "https://picsum.photos/seed/lisbon-d/900/900"
+    ],
+    "video": "",
+    "story": "A city that makes you earn every view. We walked roughly twelve kilometres a day, most of it vertical, and ate it all back in custard tarts.\n\nAlfama is the postcard, and it deserves to be, but the evening we remember was in **Graça** — a miradouro, a bottle of vinho verde bought from a kiosk, and a man playing fado to about nine people who all seemed to know him.",
+    "recs": [
+      {
+        "kind": "eat",
+        "name": "Cervejaria Ramiro",
+        "note": "Shellfish by weight, beer by the litre. Expect to queue; it's worth it. Finish with the steak sandwich.",
+        "url": ""
+      },
+      {
+        "kind": "drink",
+        "name": "Miradouro da Senhora do Monte",
+        "note": "Highest viewpoint in the city, least crowded. Bring your own bottle.",
+        "url": ""
+      },
+      {
+        "kind": "do",
+        "name": "Tram 28, but backwards",
+        "note": "Ride it from the far end at Martim Moniz to get a seat, or skip it and walk the route.",
+        "url": ""
+      },
+      {
+        "kind": "tip",
+        "name": "Shoes with grip",
+        "note": "The pavement is polished limestone. In rain it's an ice rink and that is not a joke.",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "patagonia",
+    "name": "Torres del Paine",
+    "country": "Chile",
+    "flag": "🇨🇱",
+    "emoji": "🏔️",
+    "lat": -50.9423,
+    "lng": -73.4068,
+    "date": "2023-02",
+    "rating": 5,
+    "tags": [
+      "hiking",
+      "wind",
+      "no signal"
+    ],
+    "photos": [
+      "https://picsum.photos/seed/patagonia-a/1400/900",
+      "https://picsum.photos/seed/patagonia-b/900/900",
+      "https://picsum.photos/seed/patagonia-c/900/900"
+    ],
+    "video": "",
+    "story": "Five days on the W trek and four distinct seasons per afternoon. The wind here is not weather, it is a presence — it leans on you, it takes your words sideways, it flattens the lakes into hammered metal.\n\nDay three we got up at three in the morning to climb the moraine to the base of the towers in the dark. Sixty people shivering on rocks in silence, waiting. When the sun hit the granite it went the colour of a struck match and nobody said anything at all for about a minute. Then everyone started crying or laughing. **Worth every step.**",
+    "recs": [
+      {
+        "kind": "do",
+        "name": "Base of the Towers at sunrise",
+        "note": "Leave Chileno by 3:30am. Head torch, gloves, more layers than feels sane.",
+        "url": ""
+      },
+      {
+        "kind": "stay",
+        "name": "Refugio Grey",
+        "note": "Book months out. The deck looks straight onto the glacier and they sell beer.",
+        "url": ""
+      },
+      {
+        "kind": "tip",
+        "name": "Pack for all four seasons",
+        "note": "Sun, hail, and 90km/h wind in a single afternoon is a normal day, not a bad one.",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "marrakech",
+    "name": "Marrakech",
+    "country": "Morocco",
+    "flag": "🇲🇦",
+    "emoji": "🫖",
+    "lat": 31.6295,
+    "lng": -7.9811,
+    "date": "2022-11",
+    "rating": 4,
+    "tags": [
+      "souks",
+      "rooftops",
+      "mint tea"
+    ],
+    "photos": [
+      "https://picsum.photos/seed/marrakech-a/1400/900",
+      "https://picsum.photos/seed/marrakech-b/900/900",
+      "https://picsum.photos/seed/marrakech-c/900/900",
+      "https://picsum.photos/seed/marrakech-d/900/900"
+    ],
+    "video": "",
+    "story": "Sensory overload, in the good way and occasionally in the other way. The medina is a deliberate labyrinth and your phone's map will lie to you with total confidence.\n\nOur best hours were the quiet ones: the **Jardin Majorelle** at opening time, and long afternoons on the riad roof with a pot of tea while the call to prayer went up from four directions at slightly different times.",
+    "recs": [
+      {
+        "kind": "eat",
+        "name": "Jemaa el-Fnaa food stalls",
+        "note": "Pick the busiest one with the most locals. Stall numbers change; crowds don't lie.",
+        "url": ""
+      },
+      {
+        "kind": "stay",
+        "name": "Any riad inside the medina",
+        "note": "Courtyard, fountain, roof terrace. The temperature drop walking in from the street is magic.",
+        "url": ""
+      },
+      {
+        "kind": "do",
+        "name": "Jardin Majorelle at 8am",
+        "note": "First slot of the day, before the tour buses. Book online the night before.",
+        "url": ""
+      },
+      {
+        "kind": "tip",
+        "name": "Carry small notes",
+        "note": "Nobody has change, ever, and it's always somehow your problem.",
+        "url": ""
+      }
+    ]
+  },
+  {
+    "id": "reykjavik",
+    "name": "Reykjavík & the Ring Road",
+    "country": "Iceland",
+    "flag": "🇮🇸",
+    "emoji": "❄️",
+    "lat": 64.1466,
+    "lng": -21.9426,
+    "date": "2022-03",
+    "rating": 5,
+    "tags": [
+      "aurora",
+      "road trip",
+      "hot springs"
+    ],
+    "photos": [
+      "https://picsum.photos/seed/iceland-a/1400/900",
+      "https://picsum.photos/seed/iceland-b/900/900",
+      "https://picsum.photos/seed/iceland-c/900/900",
+      "https://picsum.photos/seed/iceland-d/900/900",
+      "https://picsum.photos/seed/iceland-e/900/900"
+    ],
+    "video": "",
+    "story": "Ten days, one small car, 2,400 kilometres and an almost religious relationship with the weather forecast site. We saw the aurora on night six, from a lay-by somewhere east of Vík, after four nights of cloud and quiet despair.\n\nThe real surprise wasn't the famous stuff. It was the **public swimming pools** — every town has one, geothermal, open late, two euros, full of locals discussing the day in water hot enough to hurt.",
+    "recs": [
+      {
+        "kind": "do",
+        "name": "Local pools over the Blue Lagoon",
+        "note": "Hofsós and Laugardalslaug. A fraction of the price and nobody is filming themselves.",
+        "url": ""
+      },
+      {
+        "kind": "tip",
+        "name": "Check road.is and vedur.is daily",
+        "note": "Roads close without much warning. Plans here are suggestions.",
+        "url": ""
+      },
+      {
+        "kind": "do",
+        "name": "Drive the Snæfellsnes peninsula",
+        "note": "Iceland's greatest hits in one day loop, with a tenth of the crowds.",
+        "url": ""
+      },
+      {
+        "kind": "eat",
+        "name": "Petrol station hot dogs",
+        "note": "Unironically excellent. Order 'eina með öllu' — one with everything.",
+        "url": ""
+      }
+    ]
+  }
+]
